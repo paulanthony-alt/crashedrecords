@@ -618,6 +618,8 @@
   let currentPath = null;
 
   function route() {
+    // Plain in-page anchors (e.g. the skip link's #view) aren't routes.
+    if (location.hash && location.hash.indexOf('#/') !== 0) return;
     const path = (location.hash.replace(/^#/, '') || '/').split('?')[0];
     let out = null;
     lists = {};
