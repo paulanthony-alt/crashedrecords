@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crashed Records</title>
+<meta name="description" content="Crashed Records — psychedelic hip hop & rap from the other side of the sky. Shit that makes you float.">
+<meta name="theme-color" content="#07060B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Crashed Records">
+<meta property="og:description" content="Psychedelic hip hop & rap from the other side of the sky.">
+<meta property="og:image" content="assets/img/logo.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23E8E1D3'/%3E%3Cstop offset='.5' stop-color='%23C9A8FF'/%3E%3Cstop offset='1' stop-color='%238B5CF6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 0C12.8 8.6 15.4 11.2 24 12C15.4 12.8 12.8 15.4 12 24C11.2 15.4 8.6 12.8 0 12C8.6 11.2 11.2 8.6 12 0Z' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a href="#view" class="skip-link">Skip to content</a>
+
+<!-- shared SVG defs: liquid marble warp, film grain, star gradient -->
+<svg aria-hidden="true" width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="cr-liquid" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="3" seed="11" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="220" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="cr-grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <linearGradient id="cr-star" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8E1D3"/><stop offset=".5" stop-color="#C9A8FF"/><stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <nav aria-label="Primary" class="nav">
+    <a href="#/" class="brand" aria-label="Crashed Records home">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M12 0C12.8 8.6 15.4 11.2 24 12C15.4 12.8 12.8 15.4 12 24C11.2 15.4 8.6 12.8 0 12C8.6 11.2 11.2 8.6 12 0Z" fill="url(#cr-star)"/></svg>
+      CRASHED
+    </a>
+    <div class="nav-links">
+      <a href="#/artists" data-nav="artists">Artists</a>
+      <a href="#/releases" data-nav="releases">Releases</a>
+      <a href="#/trip-log" data-nav="trip-log">Trip Log</a>
+      <a href="#/visuals" data-nav="visuals">Visuals</a>
+      <a href="#/shop" data-nav="merch">Merch</a>
+    </div>
+    <div class="nav-actions">
+      <button type="button" aria-label="Search" class="cr-star-btn" data-action="open-search">
+        <svg aria-hidden="true" class="cr-star-shape" viewBox="0 0 64 64"><path d="M32 1C34 21 43 30 63 32C43 34 34 43 32 63C30 43 21 34 1 32C21 30 30 21 32 1Z" fill="rgba(7,6,11,.55)" stroke="url(#cr-star)" stroke-width="1.2"/></svg>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <button type="button" aria-label="Cart" class="cr-star-btn" data-action="open-cart">
+        <svg aria-hidden="true" class="cr-star-shape" viewBox="0 0 64 64"><path d="M32 1C34 21 43 30 63 32C43 34 34 43 32 63C30 43 21 34 1 32C21 30 30 21 32 1Z" fill="rgba(7,6,11,.55)" stroke="url(#cr-star)" stroke-width="1.2"/></svg>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>
+        <span class="cart-count" hidden>0</span>
+      </button>
+      <button type="button" class="btn-listen cr-btn" data-action="listen">Listen</button>
+      <button type="button" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu" data-action="open-menu">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main id="view" tabindex="-1"></main>
+
+<!-- ============ PERSISTENT PLAYER ============ -->
+<div class="player-dock">
+  <div id="player" class="player" role="region" aria-label="Music player">
+    <div aria-hidden="true" class="p-disc"><div class="cr-liquid" style="position:absolute;inset:-30%"><div class="cr-marble" style="position:absolute;inset:0"></div></div><span class="p-hole"></span></div>
+    <button type="button" class="p-skip hide-sm" data-action="prev" aria-label="Previous track"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/></svg></button>
+    <button type="button" class="p-toggle" data-action="toggle" aria-label="Play"></button>
+    <button type="button" class="p-skip hide-sm" data-action="next" aria-label="Next track"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"/></svg></button>
+    <div class="p-info">
+      <a class="p-title" href="#/"></a>
+      <a class="p-artist" href="#/"></a>
+    </div>
+    <div class="p-progress hide-sm">
+      <span class="p-cur">0:00</span>
+      <input class="p-seek range" type="range" min="0" max="1" step="0.001" value="0" aria-label="Seek">
+      <span class="p-dur">0:00</span>
+    </div>
+    <label class="p-volume hide-md"><span class="sr-only">Volume</span>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 010 6"/></svg>
+      <input class="p-vol range" type="range" min="0" max="1" step="0.01" value="0.8">
+    </label>
+    <button type="button" class="p-queue-btn" data-action="queue" aria-expanded="false" aria-controls="queue">Queue</button>
+    <div id="queue" class="queue" hidden>
+      <p class="credit-h">Playing from <span class="queue-from"></span></p>
+      <ol id="queue-list"></ol>
+    </div>
+  </div>
+</div>
+
+<!-- ============ OVERLAYS ============ -->
+<div id="search" class="layer layer-search" role="dialog" aria-modal="true" aria-label="Search" hidden>
+  <div class="layer-backdrop"></div>
+  <div class="search-panel">
+    <div class="search-bar">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <label for="search-input" class="sr-only">Search</label>
+      <input id="search-input" type="search" placeholder="Search the float…" autocomplete="off" data-autofocus>
+      <button type="button" class="close-btn" data-action="close" aria-label="Close search">Esc</button>
+    </div>
+    <div id="search-results" class="search-results" aria-live="polite"></div>
+  </div>
+</div>
+
+<div id="cart" class="layer layer-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-h" hidden>
+  <div class="layer-backdrop"></div>
+  <aside class="drawer">
+    <div class="drawer-head"><h2 id="cart-h" class="h-buy">Your cart</h2><button type="button" class="close-btn" data-action="close" aria-label="Close cart">✕</button></div>
+    <div id="cart-body" class="drawer-body"></div>
+    <div id="cart-foot" class="drawer-foot"></div>
+  </aside>
+</div>
+
+<div id="product-modal" class="layer layer-modal" role="dialog" aria-modal="true" aria-labelledby="product-title" hidden>
+  <div class="layer-backdrop"></div>
+  <div class="modal"><button type="button" class="close-btn modal-close" data-action="close" aria-label="Close">✕</button><div id="product-body"></div></div>
+</div>
+
+<div id="video-modal" class="layer layer-modal" role="dialog" aria-modal="true" aria-label="Video" hidden>
+  <div class="layer-backdrop"></div>
+  <div class="modal modal-video"><button type="button" class="close-btn modal-close" data-action="close" aria-label="Close video">✕</button><div id="video-frame" class="video-frame"></div></div>
+</div>
+
+<div id="mobile-menu" class="layer layer-menu" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <div class="menu-panel">
+    <div class="menu-head">
+      <a href="#/" class="brand">CRASHED</a>
+      <button type="button" class="close-btn" data-action="close" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="mobile-menu" aria-label="Mobile">
+      <a href="#/artists" data-nav="artists">Artists</a>
+      <a href="#/releases" data-nav="releases">Releases</a>
+      <a href="#/shows" data-nav="trip-log">Trip Log</a>
+      <a href="#/visuals" data-nav="visuals">Visuals</a>
+      <a href="#/shop" data-nav="merch">Merch</a>
+      <a href="#/contact/demos" data-nav="contact">Contact</a>
+    </nav>
+    <div class="menu-foot">
+      <button type="button" class="btn btn-prism" data-action="listen">Listen now</button>
+      <button type="button" class="btn btn-ghost" data-action="open-search">Search</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<noscript><p style="padding:120px 24px;color:#E8E1D3;font-family:sans-serif;text-align:center">Crashed Records needs JavaScript to float. Please enable it.</p></noscript>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/player.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
