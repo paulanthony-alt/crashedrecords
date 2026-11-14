@@ -7,6 +7,7 @@
   'use strict';
 
   const D = window.CR_DATA;
+  if (D.founder) D.label.emails.founder = D.founder.email;
   const P = window.CRPlayer;
   const $ = (s, el) => (el || document).querySelector(s);
   const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
@@ -136,10 +137,10 @@
     return '<footer class="footer-big"><div class="footer-inner">' +
       '<div class="footer-brand"><span class="footer-word">CRASHED</span><span class="footer-records">Records</span><p class="footer-tag">' + esc(L.tagline) + '</p></div>' +
       '<nav aria-label="Footer" class="footer-nav">' +
-      '<div><span class="footer-h">Label</span><a href="#/artists">Artists</a><a href="#/releases">Releases</a><a href="#/shows">Trip Log</a><a href="#/contact/demos">Demos</a></div>' +
+      '<div><span class="footer-h">Label</span><a href="#/artists">Artists</a><a href="#/releases">Releases</a><a href="#/shows">Trip Log</a><a href="#/about">About</a><a href="#/contact/demos">Demos</a></div>' +
       '<div><span class="footer-h">Follow</span>' + ext(L.socials.instagram, 'Instagram', 'footer-link', 'Instagram') + ext(L.socials.tiktok, 'TikTok', 'footer-link', 'TikTok') + ext(L.socials.youtube, 'YouTube', 'footer-link', 'YouTube') + ext(L.socials.spotify, 'Spotify', 'footer-link', 'Spotify') + '</div>' +
-      '<div><span class="footer-h">Contact</span><a href="#/contact/booking">Booking</a><a href="#/contact/press">Press</a><a href="mailto:' + esc(L.emails.general) + '">' + esc(L.emails.general) + '</a></div>' +
-      '</nav></div><p class="footer-copy">© ' + new Date().getFullYear() + ' ' + esc(L.name) + '</p></footer>';
+      '<div><span class="footer-h">Contact</span><a href="#/about/contact">Contact Eric</a><a href="#/contact/booking">Booking</a><a href="#/contact/press">Press</a><a href="mailto:' + esc(L.emails.general) + '">' + esc(L.emails.general) + '</a></div>' +
+      '</nav></div><p class="footer-copy">© ' + new Date().getFullYear() + ' ' + esc(L.name) + ' · <button type="button" class="footer-link footer-replay" data-action="replay-intro">Replay intro</button></p></footer>';
   }
   function footerSmall() {
     return '<footer class="footer-small"><div class="footer-small-inner"><span>© ' + new Date().getFullYear() + ' ' + esc(D.label.name) + '</span>' +
@@ -488,8 +489,32 @@
     demos: { label: 'Demos', title: 'Send us your <span class="accent">trip</span>', intro: 'We listen to everything. Send a private link (SoundCloud, Dropbox, Drive) — no attachments please.' },
     booking: { label: 'Booking', title: 'Book the <span class="accent">float</span>', intro: 'Shows, festivals, label nights and listening sessions.' },
     press: { label: 'Press', title: 'Press &amp; <span class="accent">media</span>', intro: 'Interviews, premieres, promo copies and press kits.' },
-    general: { label: 'General', title: 'Say <span class="accent">hello</span>', intro: 'Anything else on your mind.' }
+    general: { label: 'General', title: 'Say <span class="accent">hello</span>', intro: 'Anything else on your mind.' },
+    founder: { label: 'Eric (Founder)', title: 'Talk to <span class="accent">Eric</span>', intro: 'Reach the founder of Crashed Records directly.' }
   };
+  /** Shared contact form: used on #/contact/<topic> and the About page (topic "founder"). */
+  function contactForm(topic, cls) {
+    const id = (k) => 'c-' + topic + '-' + k;
+    const field = (k, label, input, opt) => '<div class="field"><label for="' + id(k) + '">' + label + (opt ? ' <span class="opt">(optional)</span>' : '') + '</label>' + input + '<p class="field-error"></p></div>';
+    return '<form class="contact-form ' + (cls || '') + '" data-form="contact" data-topic="' + topic + '" novalidate>' +
+      '<div class="field-row">' +
+        field('name', 'Name', '<input id="' + id('name') + '" name="name" autocomplete="name" required>') +
+        field('email', 'Email', '<input id="' + id('email') + '" name="email" type="email" autocomplete="email" required>') +
+      '</div>' +
+      (topic === 'demos' ? '<div class="field-row">' + field('artist', 'Artist name', '<input id="' + id('artist') + '" name="artist" required>') +
+        field('link', 'Link to music', '<input id="' + id('link') + '" name="link" type="url" placeholder="https://" required>') + '</div>' : '') +
+      (topic === 'booking' ? '<div class="field-row">' + field('artist', 'Artist', '<select id="' + id('artist') + '" name="artist">' + artists.map((a) => '<option>' + esc(a.name) + '</option>').join('') + '<option>Label night (multiple)</option></select>') +
+        field('when', 'Date &amp; city', '<input id="' + id('when') + '" name="when" placeholder="e.g. 14 Mar, Berlin">') + '</div>' : '') +
+      (topic === 'press' ? field('outlet', 'Outlet', '<input id="' + id('outlet') + '" name="outlet" required>') : '') +
+      (topic === 'founder' ? '<div class="field-row">' + field('subject', 'What\'s it about?', '<select id="' + id('subject') + '" name="subject">' +
+          ['Signing / demos', 'Collaboration', 'Booking', 'Press', 'Business', 'Just saying hi'].map((o) => '<option>' + o + '</option>').join('') + '</select>') +
+        field('link', 'Link', '<input id="' + id('link') + '" name="link" type="url" placeholder="https://">', true) + '</div>' : '') +
+      field('message', 'Message', '<textarea id="' + id('message') + '" name="message" rows="6" required></textarea>') +
+      '<button type="submit" class="btn btn-prism cr-btn">' + (topic === 'founder' ? 'Send to ' + esc(D.founder.name.split(' ')[0]) : 'Send it') + '</button>' +
+      '<p class="form-status" role="status"></p>' +
+    '</form>';
+  }
+
   views.contact = function (topic) {
     topic = CONTACT[topic] ? topic : 'general';
     const c = CONTACT[topic];
@@ -498,23 +523,73 @@
       '<nav aria-label="Contact topic" class="chips" style="margin-bottom:40px">' + Object.keys(CONTACT).map((k) =>
         '<a class="chip" href="#/contact/' + k + '"' + (k === topic ? ' aria-current="page"' : '') + '>' + CONTACT[k].label + '</a>').join('') + '</nav>' +
       '<div class="split" style="padding:0;gap:64px">' +
-      '<form class="contact-form split-main" data-form="contact" data-topic="' + topic + '" novalidate>' +
-        '<div class="field-row">' +
-          '<div class="field"><label for="c-name">Name</label><input id="c-name" name="name" autocomplete="name" required><p class="field-error"></p></div>' +
-          '<div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" required><p class="field-error"></p></div>' +
-        '</div>' +
-        (topic === 'demos' ? '<div class="field-row"><div class="field"><label for="c-artist">Artist name</label><input id="c-artist" name="artist" required><p class="field-error"></p></div>' +
-          '<div class="field"><label for="c-link">Link to music</label><input id="c-link" name="link" type="url" placeholder="https://" required><p class="field-error"></p></div></div>' : '') +
-        (topic === 'booking' ? '<div class="field-row"><div class="field"><label for="c-artist">Artist</label><select id="c-artist" name="artist">' + artists.map((a) => '<option>' + esc(a.name) + '</option>').join('') + '<option>Label night (multiple)</option></select></div>' +
-          '<div class="field"><label for="c-date">Date &amp; city</label><input id="c-date" name="when" placeholder="e.g. 14 Mar, Berlin"><p class="field-error"></p></div></div>' : '') +
-        (topic === 'press' ? '<div class="field"><label for="c-outlet">Outlet</label><input id="c-outlet" name="outlet" required><p class="field-error"></p></div>' : '') +
-        '<div class="field"><label for="c-msg">Message</label><textarea id="c-msg" name="message" rows="6" required></textarea><p class="field-error"></p></div>' +
-        '<button type="submit" class="btn btn-prism cr-btn">Send it</button>' +
-        '<p class="form-status" role="status"></p>' +
-      '</form>' +
+      contactForm(topic, 'split-main') +
       '<aside class="split-side"><p class="credit-h">Or email directly</p><p class="credit"><a class="u-link" href="mailto:' + esc(D.label.emails[topic]) + '">' + esc(D.label.emails[topic]) + '</a></p>' +
         '<p class="fine" style="margin-top:20px">Sending opens your email app with everything filled in.</p></aside>' +
       '</div></section></div>' + footerSmall();
+  };
+
+  /* ---------- about ---------- */
+  views.about = function () {
+    const A = D.about, F = D.founder;
+    const first = F.name.split(' ')[0];
+    const ig = F.socials && F.socials.instagram;
+    return pageHero('✦ About', A.headline, esc(A.intro), 20) +
+      '<div class="wrap">' +
+      '<section class="sec" style="padding-top:64px">' +
+        '<div class="split" style="padding:0">' +
+          '<div class="split-main">' + eyebrow('✦ The story') +
+            '<h2 class="h-section" style="margin-bottom:32px">A label for<br><span class="accent">the float</span></h2>' +
+            '<div class="about-story">' + A.story.map((p) => '<p class="body-copy">' + esc(p) + '</p>').join('') + '</div>' +
+          '</div>' +
+          '<aside class="split-side about-facts">' +
+            '<dl>' +
+              '<div><dt>Founded by</dt><dd><a href="#/about/founder" data-action="scroll" data-target="founder">' + esc(F.name) + '</a></dd></div>' +
+              '<div><dt>Sound</dt><dd>Psychedelic hip hop &amp; rap</dd></div>' +
+              '<div><dt>Roster</dt><dd><a href="#/artists">' + artists.length + ' artist' + (artists.length === 1 ? '' : 's') + '</a></dd></div>' +
+              '<div><dt>Catalog</dt><dd><a href="#/releases">' + releases.length + ' release' + (releases.length === 1 ? '' : 's') + '</a></dd></div>' +
+              '<div><dt>Status</dt><dd class="status"><span class="status-dot" aria-hidden="true"></span>Accepting demos</dd></div>' +
+            '</dl>' +
+          '</aside>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="sec-sm" aria-labelledby="pillars-h">' +
+        '<h2 id="pillars-h" class="h-sub">What we stand for</h2>' +
+        '<div class="pillars">' + A.pillars.map((p, i) =>
+          '<div class="pillar cr-card"><span class="pillar-no">0' + (i + 1) + '</span>' + starSvg('', 'width:22px') +
+          '<h3>' + esc(p.title) + '</h3><p>' + esc(p.text) + '</p></div>').join('') + '</div>' +
+      '</section>' +
+
+      '<section id="founder" class="founder" aria-labelledby="founder-h">' +
+        '<div class="founder-photo">' +
+          '<div aria-hidden="true" class="cr-liquid founder-glow"><div class="cr-marble" style="position:absolute;inset:0"></div></div>' +
+          '<div class="founder-arch">' + (F.photo ? '<img src="' + esc(F.photo) + '" alt="' + esc(F.name) + ', founder of Crashed Records" width="288" height="360">' : '') + '</div>' +
+          longStar('position:absolute;right:-6px;top:8%;width:22px;z-index:2') +
+        '</div>' +
+        '<div class="founder-info">' + eyebrow('✦ ' + esc(F.role)) +
+          '<h2 id="founder-h" class="founder-name">' + esc(F.name) + '</h2>' +
+          F.bio.map((p) => '<p class="body-copy">' + esc(p) + '</p>').join('') +
+          '<div class="btn-row" style="margin-top:8px">' +
+            '<button type="button" class="btn btn-prism cr-btn" data-action="scroll" data-target="contact-founder">Message ' + esc(first) + '</button>' +
+            '<a class="btn-mono" href="mailto:' + esc(F.email) + '">' + esc(F.email) + '</a>' +
+            (ig ? '<a class="icon-btn" href="' + esc(ig) + '" target="_blank" rel="noopener" aria-label="' + esc(first) + ' on Instagram">' + ICON.instagram + '</a>' : '') +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section id="contact-founder" class="sec contact" aria-labelledby="cf-h">' +
+        '<div class="sec-head"><div>' + eyebrow('✦ Contact') + '<h2 id="cf-h" class="h-section">Talk to <span class="accent">' + esc(first) + '</span></h2></div></div>' +
+        '<div class="split" style="padding:0;gap:64px">' +
+          contactForm('founder', 'split-main') +
+          '<aside class="split-side">' +
+            '<p class="body-copy">Signing, collaborations, shows, press or just an idea: messages here go straight to ' + esc(first) + '.</p>' +
+            '<p class="credit-h" style="margin-top:12px">Email directly</p><p class="credit"><a class="u-link" href="mailto:' + esc(F.email) + '">' + esc(F.email) + '</a></p>' +
+            '<p class="fine">Sending opens your email app with everything filled in. Sending music? Include a private streaming link rather than attachments.</p>' +
+          '</aside>' +
+        '</div>' +
+      '</section>' +
+      '</div>' + footerBig();
   };
 
   views.notFound = function () {
@@ -536,7 +611,9 @@
     [/^\/shop\/?$/, () => ['merch', views.shop(), 'Shop']],
     [/^\/checkout\/?$/, () => ['', views.checkout(), 'Checkout']],
     [/^\/order\/([\w-]+)$/, (m) => ['', views.order(m[1]), 'Order confirmed']],
-    [/^\/contact(?:\/(\w+))?\/?$/, (m) => ['', views.contact(m[1]), 'Contact']]
+    [/^\/contact(?:\/(\w+))?\/?$/, (m) => ['', views.contact(m[1]), 'Contact']],
+    [/^\/about\/?$/, () => ['about', views.about(), 'About']],
+    [/^\/about\/(founder|contact)$/, (m) => ['about', views.about(), 'About', m[1] === 'founder' ? 'founder' : 'contact-founder']]
   ];
   let currentPath = null;
 
@@ -837,7 +914,7 @@
       const fd = Object.fromEntries(new FormData(form).entries());
       const topic = form.dataset.topic;
       const to = D.label.emails[topic] || D.label.emails.general;
-      const subject = '[' + CONTACT[topic].label + '] ' + (fd.artist || fd.outlet || fd.name);
+      const subject = '[' + CONTACT[topic].label + '] ' + (fd.subject ? fd.subject + ': ' : '') + (fd.artist || fd.outlet || fd.name);
       const body = Object.entries(fd).filter(([k]) => k !== 'message').map(([k, v]) => k[0].toUpperCase() + k.slice(1) + ': ' + v).join('\n') + '\n\n' + fd.message;
       window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
       form.querySelector('.form-status').textContent = '✦ Your email app should open with the message ready. If it didn\'t, write to ' + to + '.';
@@ -944,10 +1021,18 @@
         else P.setQueue(featured.trackObjs, 0, true);
         break;
       case 'soon': toast((el.dataset.what || 'This') + ' is coming soon.'); break;
+      case 'scroll': {
+        e.preventDefault();
+        const t = document.getElementById(el.dataset.target);
+        if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); const f = t.querySelector('input, textarea'); if (f) setTimeout(() => f.focus({ preventScroll: true }), 500); }
+        break;
+      }
+      case 'replay-intro': if (window.CRIntro) { window.scrollTo(0, 0); window.CRIntro.show(); } break;
     }
   });
 
   document.addEventListener('keydown', (e) => {
+    if (document.body.classList.contains('intro-open')) return;
     const typing = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.isContentEditable;
     if (e.key === 'Escape') { if (!$('#queue').hidden) { $('#queue').hidden = true; return; } closeOverlays(); }
     if (typing) return;

@@ -36,6 +36,36 @@ window.CR_DATA = {
     shipping: { flat: 6, freeOver: 75 }
   },
 
+  /* ---------- About page (#/about) ---------- */
+  about: {
+    headline: 'Born to <span class="accent">float</span>',   // HTML allowed for the accent
+    intro: 'Crashed Records is a brand-new independent label for psychedelic hip hop & rap: records built for headphones, late nights and leaving the ground for a while.',
+    story: [
+      'Crashed started with a simple idea: the strangest, most immersive corners of rap deserve a home that treats them like art, not content. Hazy loops, warped samples, voices that drift in and out of focus. Music that makes you float.',
+      'We are just getting started. That means a small roster, a lot of care, and room for artists to shape what this label becomes. Every release gets real attention, from the mix to the artwork to the pressing.',
+      'If you make music that sounds like it came from the other side of the sky, we want to hear it.'
+    ],
+    pillars: [
+      { title: 'Artist first', text: 'Fair deals, clear communication, and creative control that stays with the people making the music.' },
+      { title: 'Sound over trends', text: 'We sign records we would play on repeat, not whatever the algorithm wants this week.' },
+      { title: 'Built from zero', text: 'A young, independent label growing one release at a time, with our community along for the ride.' }
+    ]
+  },
+
+  /* ---------- Founder ---------- */
+  founder: {
+    name: 'Eric Seides',
+    role: 'Founder',
+    photo: 'assets/img/eric-seides.jpg',
+    bio: [
+      'Eric founded Crashed Records to build the label he always wanted to exist: a home for psychedelic hip hop and rap that takes the music, and the artists behind it, seriously.',
+      'He runs the label day to day, from A&R and artist development to releases and shows. If you want to work with Crashed, he is the person to talk to.'
+    ],
+    // PLACEHOLDER: replace with Eric's real address before launch.
+    email: 'eric@crashedrecords.com',
+    socials: { instagram: '' }
+  },
+
   artists: [
     {
       slug: 'lune-vega', name: 'Lune Vega', city: 'Atlanta, GA',
