@@ -20,10 +20,10 @@ window.CR_DATA = {
     tagline: 'Shit that makes you float',
     blurb: 'Psychedelic hip hop & rap from the other side of the sky. Put your headphones on and let go.',
     emails: {
-      general: 'hello@crashedrecords.com',
-      demos: 'demos@crashedrecords.com',
-      booking: 'booking@crashedrecords.com',
-      press: 'press@crashedrecords.com'
+      general: 'ericdanielseides@gmail.com',
+      demos: 'ericdanielseides@gmail.com',
+      booking: 'ericdanielseides@gmail.com',
+      press: 'ericdanielseides@gmail.com'
     },
     socials: {
       instagram: '',
