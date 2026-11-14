@@ -54,7 +54,7 @@ Everything is in `assets/js/data.js`. **The current artists, releases, dates and
 - **Artwork**: set `cover` (releases), `photo` (artists) or `image` (merch). If you leave it empty, the generated liquid-marble art is used, tinted by `hue`.
 - **Audio**: set `src` on a track (an mp3 path or URL). Tracks without a `src` play a generated synth demo loop, so every play button works in the meantime.
 - **Links**: fill in streaming, social, ticket and YouTube fields. Empty ones show a "coming soon" toast.
-- **Emails**: `label.emails`, plus `founder.email`, which is currently a **placeholder** (`eric@crashedrecords.com`).
+- **Emails**: `label.emails`, plus `founder.email` (Eric's business address).
 - **About copy**: the story, values and Eric's bio are draft text; have Eric review them.
 
 ## Needs a backend / service (next steps)

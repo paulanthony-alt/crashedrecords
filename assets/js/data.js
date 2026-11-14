@@ -61,8 +61,7 @@ window.CR_DATA = {
       'Eric founded Crashed Records to build the label he always wanted to exist: a home for psychedelic hip hop and rap that takes the music, and the artists behind it, seriously.',
       'He runs the label day to day, from A&R and artist development to releases and shows. If you want to work with Crashed, he is the person to talk to.'
     ],
-    // PLACEHOLDER: replace with Eric's real address before launch.
-    email: 'eric@crashedrecords.com',
+    email: 'ericdanielseides@gmail.com',
     socials: { instagram: '' }
   },
 
