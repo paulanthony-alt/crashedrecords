@@ -125,6 +125,7 @@
 
     var snd = el.querySelector('.cri-sound');
     var P = player();
+    if (!P || !P.current) snd.hidden = true;     // nothing to play yet: no sound toggle
     setSound(snd, !!(P && P.playing));
     snd.addEventListener('click', function () {
       var p = player();

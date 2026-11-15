@@ -21,6 +21,7 @@ python3 -m http.server 8000
 | `assets/js/player.js` | Persistent player (queue, seek, volume, Media Session) |
 | `assets/js/intro.js` + `assets/css/intro.css` | Enter animation shown on the first home-page visit each session |
 | `assets/js/viz.js` | Reactive visuals: reads the music and drives the liquid-marble canvas and the small pulsing accents |
+| `assets/js/viz.js` | Reactive visuals: reads the music and drives the liquid-marble canvas and the small pulsing accents |
 | `assets/css/styles.css` | Design tokens + all styles (from the style guide) |
 | `assets/fonts/` | Self-hosted Archivo + JetBrains Mono (OFL, see `LICENSES.txt`) |
 | `assets/img/logo.png` | Logo |
@@ -34,6 +35,7 @@ Hash routing keeps the player playing while you move between pages.
 
 ## What works
 
+- **Reactive visuals**: the backdrops and accents move with the music (see below).
 - **Reactive visuals**: the backdrops and accents move with the music (see below).
 - **Player**: play any track/album/top-tracks, prev/next, seek, volume, queue panel, spinning disc, lock-screen controls. `Space` plays/pauses, `/` opens search.
 - **Catalog filters** (All / Albums / EPs / Singles), on the home page and the releases page.
@@ -59,9 +61,30 @@ The big backdrops (home, page headers, artist and release pages, the intro) are 
 - **Off switch**: "Reactive visuals" at the bottom of the Queue panel (remembered per browser). It is off automatically for visitors whose device asks for reduced motion.
 - To give another backdrop the effect, add `data-viz` to its marble wrapper; to make an element pulse, add `data-react` and use the `--k` (kick), `--b` (bass) and `--l` (level) CSS variables.
 
+## Founding roster (no artists yet)
+
+`data.js` starts with **no artists, releases, shows or videos**, so the site doesn't show invented acts. Until real ones are added, the site shows a "Now signing / Founding roster" state:
+
+- **Home:** "Now signing" block, four open artist slots, a "Reserved for the first release" panel, and a "Submit your music" button in the header.
+- **Artists and Releases pages:** the same open-slot and first-release treatment.
+- **Player, Sound toggle in the intro, "Listen" buttons:** hidden or pointed at the submission form, because there is nothing to play yet.
+- **Wording:** edit `founding` in `data.js`.
+- **Preview the full site with sample artists and releases:** add `?demo` to the address (`http://localhost:8000/?demo`). The sample content lives in `assets/js/sample-content.js`, which is never loaded otherwise.
+- **To go from empty to populated:** add artists and releases to `data.js`. Each state switches on by itself.
+
+## Reactive visuals
+
+The big backdrops (home, page headers, artist and release pages, the intro) are drawn by one WebGL canvas that moves with whatever is playing: bass swells the liquid warp, mids speed up the flow, highs add veins of light. The logo, the player bar, the cover of the playing record and the little EQ bars pulse too.
+
+- **Silent**, it looks the same as the CSS marble it replaces, which stays in the page as the fallback.
+- **Demo beats** are analysed live. **Real audio files** are fetched once and turned into a small loudness map, so playback is never rerouted and music keeps playing with a phone locked. A file on another domain needs CORS headers to be analysed; without them the visuals fall back to a gentle generic sway.
+- **Slow devices**: the canvas lowers its own resolution until frames are smooth, and browsers with software-only WebGL get the CSS version.
+- **Off switch**: "Reactive visuals" at the bottom of the Queue panel (remembered per browser). It is off automatically for visitors whose device asks for reduced motion.
+- To give another backdrop the effect, add `data-viz` to its marble wrapper; to make an element pulse, add `data-react` and use the `--k` (kick), `--b` (bass) and `--l` (level) CSS variables.
+
 ## Before launch — swap in real content
 
-Everything is in `assets/js/data.js`. **The current artists, releases, dates and prices are sample content.**
+Everything is in `assets/js/data.js`. **Artists, releases, dates and videos start empty; the shop's merch items and prices are still sample content.**
 
 - **Artwork**: set `cover` (releases), `photo` (artists) or `image` (merch). If you leave it empty, the generated liquid-marble art is used, tinted by `hue`.
 - **Audio**: set `src` on a track (an mp3 path or URL). Tracks without a `src` play a generated synth demo loop, so every play button works in the meantime.

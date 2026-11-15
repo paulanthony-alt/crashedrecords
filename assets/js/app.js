@@ -158,13 +158,52 @@
   let lists = {};
   const regList = (key, tracks) => { lists[key] = tracks; return key; };
 
+
+  /* ---------- "founding roster" state: no signed artists / releases yet ---------- */
+  const F = D.founding || {};
+  const hasMusic = !!featured;
+  const submitBtn = '<a href="#/contact/demos" class="btn btn-prism cr-btn">Submit your music</a>';
+
+  function slotCard(i) {
+    const hues = [0, 60, -50, 110, -100, 150];
+    return '<a class="artist-card slot-card cr-card" href="#/contact/demos" aria-label="Open slot ' + (i + 1) + ': submit your music">' +
+      art({ hue: hues[i % hues.length], rot: 47 * (i + 1) }) +
+      '<div aria-hidden="true" class="fade-bottom"></div>' +
+      '<span class="artist-no">A—' + pad2(i + 1) + '</span>' +
+      '<div class="artist-card-body"><p class="artist-card-tag">Open slot</p><p class="artist-card-name">Your name</p></div></a>';
+  }
+  const slotGrid = (n) => '<div class="roster-grid">' + Array.from({ length: n }, (_, i) => slotCard(i)).join('') + '</div>';
+
+  function emptyPanel(no, title, text, actions) {
+    return '<div class="empty-panel"><div class="empty-copy"><p class="eyebrow" style="margin:0 0 12px">' + no + '</p>' +
+      '<h3 class="empty-title">' + title + '</h3><p class="body-copy">' + text + '</p></div><div class="btn-row">' + actions + '</div></div>';
+  }
+  const dropAlertsBtn = '<button type="button" class="btn btn-ghost cr-btn" data-action="scroll" data-target="join">Get drop alerts</button>';
+
+  /** Home: the "Now floating" slot becomes "Now signing" until there is a release to feature. */
+  function signingSection() {
+    return '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
+      '<div class="nf-art"><div aria-hidden="true" class="vinyl-bg"><div class="grooves"></div></div>' +
+        '<a href="#/contact/demos" class="cover cr-card nf-cover" aria-label="Submit your music">' + art({ hue: 0, rot: -80 }) +
+          '<div class="cover-foot"><span>CR—001</span><span>OPEN</span></div></a></div>' +
+      '<div class="nf-info"><div class="eyebrow eyebrow-eq">' + ICON.eq.replace('class="eq"', 'class="eq on"') + esc(F.kicker || 'Now signing') + '</div>' +
+        '<h2 id="nf-h" class="nf-title">' + (F.headline || 'Founding<br>roster') + '</h2>' +
+        (F.by ? '<p class="nf-by">' + esc(F.by) + '</p>' : '') +
+        (F.text ? '<p class="body-copy">' + esc(F.text) + '</p>' : '') +
+        '<div class="btn-row">' + submitBtn + '<a href="#/about/founder" class="btn btn-ghost cr-btn">Meet Eric</a></div>' +
+      '</div></section>';
+  }
+
   /* ------------------------------------------------------------------ views */
   const views = {};
 
   views.home = function () {
     const f = featured;
-    regList('featured', f.trackObjs);
-    const marquee = '<span>New drop</span><span class="m-star">✦</span><span class="m-it">' + esc(f.title) + ' — ' + esc(f.artistObj.name) + '</span><span class="m-star">✦</span><span>Out now everywhere</span><span class="m-star">✦</span><span class="m-it">' + esc(D.label.tagline) + '</span><span class="m-star">✦</span>';
+    if (f) regList('featured', f.trackObjs);
+    const star = '<span class="m-star">✦</span>';
+    const marquee = f
+      ? '<span>New drop</span>' + star + '<span class="m-it">' + esc(f.title) + ' — ' + esc(f.artistObj.name) + '</span>' + star + '<span>Out now everywhere</span>' + star + '<span class="m-it">' + esc(D.label.tagline) + '</span>' + star
+      : '<span>Now signing</span>' + star + '<span class="m-it">Psychedelic hip hop &amp; trap</span>' + star + '<span>Founding roster open</span>' + star + '<span class="m-it">' + esc(D.label.tagline) + '</span>' + star;
     const vid = D.videos[0];
     const vidArtist = vid && artistBy[vid.artist];
     return '' +
@@ -183,7 +222,7 @@
         '<p class="hero-text">' + esc(D.label.blurb) + '</p>' +
         '<div class="hero-ctas">' +
           '<a href="#/now-floating" class="btn btn-prism cr-btn">' + ICON.play + 'Enter the float</a>' +
-          '<a href="#/artists" class="btn btn-ghost cr-btn">Meet the roster</a>' +
+          '<a href="#/artists" class="btn btn-ghost cr-btn">' + (artists.length ? 'Meet the roster' : 'Join the roster') + '</a>' +
         '</div>' +
       '</div>' +
       '<a href="#/now-floating" class="scroll-cue">Drift down<span aria-hidden="true"></span></a>' +
@@ -191,8 +230,8 @@
     '<div aria-hidden="true" class="marquee"><div class="marquee-track">' + marquee + marquee + '</div></div>' +
 
     '<div class="wrap">' +
-    /* NOW FLOATING */
-    '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
+    /* NOW FLOATING (becomes NOW SIGNING until there is a release to feature) */
+    (!f ? signingSection() : '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
       '<div class="nf-art">' +
         '<div aria-hidden="true" class="vinyl-bg"><div class="grooves"></div></div>' +
         '<a href="#/releases/' + f.slug + '" class="cover cr-card nf-cover" data-cover="' + f.slug + '" aria-label="' + esc(f.title) + ' — full release">' + art(f, { rot: -80 }) +
@@ -210,21 +249,26 @@
           ext(f.links.bandcamp, 'Bandcamp', 'btn-mono btn-52', 'Bandcamp link') +
         '</div>' +
       '</div>' +
-    '</section>' +
+    '</section>') +
 
     /* ROSTER */
     '<section aria-labelledby="roster-h" class="sec">' +
-      '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">Who\'s<br><span class="accent">floating</span> with us</h2></div>' +
-      '<a href="#/artists" class="more-link">All artists →</a></div>' +
-      '<div class="roster-grid">' + artists.slice(0, 4).map((a, i) => artistCard(a, i)).join('') + '</div>' +
+      (artists.length
+        ? '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">Who\'s<br><span class="accent">floating</span> with us</h2></div>' +
+          '<a href="#/artists" class="more-link">All artists →</a></div>' +
+          '<div class="roster-grid">' + artists.slice(0, 4).map((a, i) => artistCard(a, i)).join('') + '</div>'
+        : '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">The first<br><span class="accent">spots</span> are open</h2></div>' +
+          '<a href="#/contact/demos" class="more-link">Submit your music →</a></div>' + slotGrid(F.slots || 4)) +
     '</section>' +
 
     /* CATALOG */
     '<section aria-labelledby="cat-h" class="sec">' +
       '<div class="sec-head"><div>' + eyebrow('✦ Catalog') + '<h2 id="cat-h" class="h-section">The crash site</h2></div>' +
-      filterChips('home') + '</div>' +
-      '<div class="rel-grid" id="home-catalog">' + catalogItems('All', 6) + '</div>' +
-      '<p class="sec-foot"><a href="#/releases" class="more-link">Full catalog →</a></p>' +
+      (releases.length ? filterChips('home') : '') + '</div>' +
+      (releases.length
+        ? '<div class="rel-grid" id="home-catalog">' + catalogItems('All', 6) + '</div>' +
+          '<p class="sec-foot"><a href="#/releases" class="more-link">Full catalog →</a></p>'
+        : emptyPanel('CR—001', 'Reserved for the first release', esc(F.firstRelease || 'The first drop is coming soon.'), dropAlertsBtn)) +
     '</section>' +
 
     /* TRIP LOG */
@@ -234,7 +278,7 @@
         '<p class="body-copy">Label nights, tour stops and listening sessions.</p>' +
         (shows.length > 4 ? '<a href="#/shows" class="more-link" style="margin-top:28px;display:inline-block">All dates →</a>' : '') + '</div>' +
         (shows.length ? '<ul class="shows">' + shows.slice(0, 4).map((s) => showRow(s)).join('') + '</ul>' :
-          '<p class="empty">No dates on the board right now. Join the drift below and we\'ll tell you first.</p>') +
+          '<p class="empty">No dates on the board yet. Join the drift below and we\'ll tell you first.</p>') +
       '</div>' +
     '</section>' +
 
@@ -298,7 +342,7 @@
 
   function joinBlock() {
     const joined = store.get('newsletter', null);
-    return '<section aria-labelledby="join-h" class="join">' +
+    return '<section id="join" aria-labelledby="join-h" class="join">' +
       '<div aria-hidden="true" class="cr-liquid" style="position:absolute;inset:-20%;opacity:.55"><div class="cr-marble" style="position:absolute;inset:-20%;animation:cr-spin 100s linear infinite reverse"></div></div>' +
       '<div aria-hidden="true" style="position:absolute;inset:0;background:rgba(7,6,11,.55)"></div>' +
       '<div class="join-inner">' + longStar('width:18px') +
@@ -317,6 +361,11 @@
 
   /* ---------- artists ---------- */
   views.artists = function () {
+    if (!artists.length) {
+      return pageHero('✦ The roster', 'The first <span class="accent">spots</span> are open', 'Nobody is signed yet, which is the point. Crashed is looking for its founding artists: underground and rising names making psychedelic hip hop and trap.', 40) +
+        '<div class="wrap"><section class="sec" style="padding-top:64px">' + slotGrid(F.slots || 4) +
+        '<div class="btn-row" style="margin-top:40px">' + submitBtn + '<a href="#/about/founder" class="btn btn-ghost cr-btn">Meet Eric</a></div></section></div>' + footerSmall();
+    }
     return pageHero('✦ The roster', 'Who\'s <span class="accent">floating</span>', 'Every artist on the label. Tap in, follow, and catch them live.', 40) +
       '<div class="wrap"><section class="sec" style="padding-top:64px"><div class="roster-grid">' + artists.map((a, i) => artistCard(a, i)).join('') + '</div></section></div>' + footerSmall();
   };
@@ -367,6 +416,12 @@
 
   /* ---------- releases ---------- */
   views.releases = function () {
+    if (!releases.length) {
+      return pageHero('✦ Catalog', 'The crash <span class="accent">site</span>', 'Every record we put into orbit will live here, newest first.', -40) +
+        '<div class="wrap"><section class="sec" style="padding-top:56px">' +
+        emptyPanel('CR—001', 'Reserved for the first release', esc(F.firstRelease || 'The first drop is coming soon.'), dropAlertsBtn + '<a href="#/contact/demos" class="btn btn-ghost cr-btn">Submit your music</a>') +
+        '</section>' + joinBlock() + '</div>' + footerSmall();
+    }
     return pageHero('✦ Catalog', 'The crash <span class="accent">site</span>', 'Every record we\'ve put into orbit, newest first.', -40) +
       '<div class="wrap"><section class="sec" style="padding-top:56px">' +
       '<div class="sec-head" style="margin-bottom:32px"><p class="count" id="rel-count">' + releases.length + ' releases</p>' + filterChips('page') + '</div>' +
@@ -436,8 +491,8 @@
     return pageHero('✦ Merch', 'Wear the <span class="accent">float</span>', 'Apparel, wax and small objects for the trip. Ships worldwide.', 120) +
       '<div class="wrap"><section class="sec" style="padding-top:56px"><h2 class="h-sub" style="margin-bottom:32px">Merch</h2>' +
       '<div class="merch-grid">' + merch.map(merchCard).join('') + '</div></section>' +
-      '<section class="sec" style="padding-top:0"><div class="sec-head" style="margin-bottom:32px"><h2 class="h-sub" style="margin:0">Records</h2><a href="#/releases" class="more-link">Full catalog →</a></div>' +
-      '<div class="rel-grid wide">' + records.map((r) => releaseCard(r)).join('') + '</div></section></div>' + footerSmall();
+      (records.length ? '<section class="sec" style="padding-top:0"><div class="sec-head" style="margin-bottom:32px"><h2 class="h-sub" style="margin:0">Records</h2><a href="#/releases" class="more-link">Full catalog →</a></div>' +
+      '<div class="rel-grid wide">' + records.map((r) => releaseCard(r)).join('') + '</div></section>' : '') + '</div>' + footerSmall();
   };
 
   /* ---------- checkout ---------- */
@@ -545,9 +600,9 @@
           '<aside class="split-side about-facts">' +
             '<dl>' +
               '<div><dt>Founded by</dt><dd><a href="#/about/founder" data-action="scroll" data-target="founder">' + esc(F.name) + '</a></dd></div>' +
-              '<div><dt>Sound</dt><dd>Psychedelic hip hop &amp; rap</dd></div>' +
-              '<div><dt>Roster</dt><dd><a href="#/artists">' + artists.length + ' artist' + (artists.length === 1 ? '' : 's') + '</a></dd></div>' +
-              '<div><dt>Catalog</dt><dd><a href="#/releases">' + releases.length + ' release' + (releases.length === 1 ? '' : 's') + '</a></dd></div>' +
+              '<div><dt>Sound</dt><dd>Psychedelic hip hop &amp; trap</dd></div>' +
+              '<div><dt>Roster</dt><dd><a href="#/artists">' + (artists.length ? artists.length + ' artist' + (artists.length === 1 ? '' : 's') : 'Founding spots open') + '</a></dd></div>' +
+              '<div><dt>Catalog</dt><dd><a href="#/releases">' + (releases.length ? releases.length + ' release' + (releases.length === 1 ? '' : 's') : 'First drop coming') + '</a></dd></div>' +
               '<div><dt>Status</dt><dd class="status"><span class="status-dot" aria-hidden="true"></span>Accepting demos</dd></div>' +
             '</dl>' +
           '</aside>' +
@@ -631,7 +686,7 @@
     if (!samePage) {
       $('#view').innerHTML = html;
       document.body.dataset.view = nav || 'page';
-      if (nav === 'home') regList('featured', featured.trackObjs);
+      if (nav === 'home' && featured) regList('featured', featured.trackObjs);
     }
     currentPath = path;
     document.title = title + ' · ' + D.label.name;
@@ -806,6 +861,7 @@
     PUI.cur = $('.p-cur'); PUI.dur = $('.p-dur'); PUI.queue = $('#queue-list');
     P.setVolume(store.get('volume', 0.8));
     $('.p-vol').value = P.volume;
+    if (!featured) return;                       // no music yet: initMusicless() hides the player
     P.setQueue(featured.trackObjs, 0, false);
 
     P.on((type) => {
@@ -1020,8 +1076,10 @@
       case 'open-menu': openLayer('mobile-menu'); el.setAttribute('aria-expanded', 'true'); break;
       case 'close': closeOverlays(); break;
       case 'video': openVideo(+el.dataset.i); break;
+      case 'sign': closeOverlays(true); location.hash = '#/contact/demos'; break;
       case 'listen':
         closeOverlays(true);
+        if (!featured) { location.hash = '#/contact/demos'; break; }
         if (P.current && P.current.releaseSlug === featured.slug) { if (!P.playing) P.play(); }
         else P.setQueue(featured.trackObjs, 0, true);
         break;
@@ -1071,6 +1129,12 @@
   $('#search-results').addEventListener('click', (e) => { if (e.target.closest('a')) closeOverlays(true); });
   window.addEventListener('hashchange', route);
   initPlayerUI();
+  if (!hasMusic) {
+    // Nothing to play yet: hide the player and point the "Listen" buttons at the submission form.
+    document.body.classList.add('no-music');
+    const dock = $('.player-dock'); if (dock) dock.hidden = true;
+    $$('[data-action="listen"]').forEach((b) => { b.dataset.action = 'sign'; b.textContent = b.classList.contains('btn') ? 'Submit your music' : 'Submit music'; });
+  }
   renderCartUI();
   route();
 })();
