@@ -63,7 +63,7 @@ The big backdrops (home, page headers, artist and release pages, the intro) are 
 
 `data.js` starts with **no artists, releases, shows or videos**, so the site doesn't show invented acts. Until real ones are added, the site shows a "Now signing / Founding roster" state:
 
-- **Home:** "Now signing" block, four open artist slots, a "Reserved for the first release" panel, and a "Submit your music" button in the header.
+- **Home:** a "Get signed" button in the hero and menu, an "Are you next?" call-out above the newsletter, and the "Now signing" block, four open artist slots, a "Reserved for the first release" panel, and a "Submit your music" button in the header.
 - **Artists and Releases pages:** the same open-slot and first-release treatment.
 - **Player, Sound toggle in the intro, "Listen" buttons:** hidden or pointed at the submission form, because there is nothing to play yet.
 - **Wording:** edit `founding` in `data.js`.

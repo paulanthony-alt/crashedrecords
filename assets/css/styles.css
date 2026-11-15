@@ -671,6 +671,14 @@ body.no-music .toast { bottom: 24px; }
   .empty-panel .btn-row .btn { flex: 1 1 auto; justify-content: center; }
 }
 
+/* ---------- home: "Get signed" call-outs ---------- */
+.nav-cta { color: var(--lilac); }
+.next-cta { padding: 40px 0 80px; }
+.next-inner { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; padding: 56px 44px; border: 1px solid rgba(201,168,255,.25); background: rgba(17,13,26,.6); }
+.next-inner .h-section { margin: 0; }
+.next-inner .body-copy { max-width: 560px; }
+@media (max-width: 760px) { .next-inner { padding: 36px 22px; } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

@@ -180,6 +180,21 @@
   }
   const dropAlertsBtn = '<button type="button" class="btn btn-ghost cr-btn" data-action="scroll" data-target="join">Get drop alerts</button>';
 
+  /** Home: a short call to artists, placed just above the newsletter. */
+  function areYouNext() {
+    return '<section aria-labelledby="next-h" class="next-cta">' +
+      '<div class="next-inner">' +
+        eyebrow('✦ Artists') +
+        '<h2 id="next-h" class="h-section">Are you <span class="accent">next?</span></h2>' +
+        '<p class="body-copy">Crashed is signing underground and rising artists in psychedelic hip hop and trap. Send us your music and we will listen.</p>' +
+        '<div class="btn-row">' +
+          '<a href="#/contact/demos" class="btn btn-prism cr-btn">Get signed</a>' +
+          '<a href="#/about" class="btn btn-ghost cr-btn">How it works</a>' +
+        '</div>' +
+      '</div>' +
+    '</section>';
+  }
+
   /** Home: the "Now floating" slot becomes "Now signing" until there is a release to feature. */
   function signingSection() {
     return '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
@@ -223,6 +238,7 @@
         '<div class="hero-ctas">' +
           '<a href="#/now-floating" class="btn btn-prism cr-btn">' + ICON.play + 'Enter the float</a>' +
           '<a href="#/artists" class="btn btn-ghost cr-btn">' + (artists.length ? 'Meet the roster' : 'Join the roster') + '</a>' +
+          '<a href="#/contact/demos" class="btn btn-bone cr-btn">Get signed</a>' +
         '</div>' +
       '</div>' +
       '<a href="#/now-floating" class="scroll-cue">Drift down<span aria-hidden="true"></span></a>' +
@@ -299,6 +315,7 @@
       '<div class="merch-grid">' + merch.slice(0, 3).map(merchCard).join('') + '</div>' +
     '</section>' +
 
+    areYouNext() +
     joinBlock() +
     '</div>' + footerBig();
   };
