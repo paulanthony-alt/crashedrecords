@@ -78,6 +78,13 @@ body.intro-open .player-dock, body.intro-open .site-header { visibility: hidden;
 .cr-intro .cri-flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, #fff 0, var(--lilac) 22%, var(--violet) 45%, var(--void) 75%); animation: cri-flash 1.3s ease-in; }
 .cr-intro.is-entering .cri-zoom { animation: cri-zoom 1.3s cubic-bezier(.7,0,.3,1) forwards; }
 .cr-intro.is-entering .cri-marble { animation-duration: 6s; filter: hue-rotate(80deg) saturate(1.6); }
+.cr-intro .viz-canvas { transition: filter 1s; }
+.cr-intro.is-entering .viz-canvas { filter: hue-rotate(80deg) saturate(1.6) !important; }
+.cr-intro .cri-logo-float img { scale: calc(1 + var(--k, 0) * .022); }
+.viz-live .cr-intro .cri-sound[aria-pressed="true"] .cri-eq i { animation: none; }
+.viz-live .cr-intro .cri-eq i:nth-child(1) { transform: scaleY(var(--e1, .3)); }
+.viz-live .cr-intro .cri-eq i:nth-child(2) { transform: scaleY(var(--e2, .3)); }
+.viz-live .cr-intro .cri-eq i:nth-child(3) { transform: scaleY(var(--e3, .3)); }
 .cr-intro.is-entering .cri-corner { opacity: 0; transition: opacity .2s; }
 
 @media (max-width: 760px) {

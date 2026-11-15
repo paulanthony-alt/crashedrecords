@@ -71,7 +71,7 @@
 
 <!-- ============ PERSISTENT PLAYER ============ -->
 <div class="player-dock">
-  <div id="player" class="player" role="region" aria-label="Music player">
+  <div id="player" class="player" role="region" aria-label="Music player" data-react>
     <div aria-hidden="true" class="p-disc"><div class="cr-liquid" style="position:absolute;inset:-30%"><div class="cr-marble" style="position:absolute;inset:0"></div></div><span class="p-hole"></span></div>
     <button type="button" class="p-skip hide-sm" data-action="prev" aria-label="Previous track"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/></svg></button>
     <button type="button" class="p-toggle" data-action="toggle" aria-label="Play"></button>
@@ -93,6 +93,7 @@
     <div id="queue" class="queue" hidden>
       <p class="credit-h">Playing from <span class="queue-from"></span></p>
       <ol id="queue-list"></ol>
+      <button type="button" id="viz-toggle" class="viz-toggle" aria-pressed="true">Reactive visuals <span class="viz-toggle-state">On</span></button>
     </div>
   </div>
 </div>
@@ -159,6 +160,7 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/player.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/viz.js"></script>
 <script src="assets/js/intro.js"></script>
 </body>
 </html>

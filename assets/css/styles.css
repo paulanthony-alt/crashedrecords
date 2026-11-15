@@ -632,6 +632,27 @@ legend { padding: 0; margin-bottom: 14px; font-stretch: 125%; font-weight: 900; 
   .founder-info .btn-mono { height: 52px; }
 }
 
+/* ---------- reactive visuals (see assets/js/viz.js) ---------- */
+.viz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.viz-canvas[data-kind="release"] { inset: 0 0 auto 0; height: 1200px; -webkit-mask-image: linear-gradient(#000 45%, transparent 90%); mask-image: linear-gradient(#000 45%, transparent 90%); }
+.viz-hidden { display: none !important; }            /* the CSS marble the canvas is standing in for */
+/* accents: --k = kick pulse, --b = bass, --l = overall level (all 0..1, set per element by viz.js) */
+.hero-logo { position: relative; }
+.hero-logo::before { content: ''; position: absolute; inset: 12% 8%; border-radius: 50%; background: radial-gradient(closest-side, rgba(192,38,211,.55), rgba(124,58,237,.25) 55%, transparent); filter: blur(30px); opacity: calc(var(--b, 0) * .7); will-change: opacity; pointer-events: none; }
+.hero-logo img { position: relative; scale: calc(1 + var(--k, 0) * .022); }
+.player::before { content: ''; position: absolute; inset: 0; z-index: -1; box-shadow: 0 0 46px 4px rgba(192,38,211,.6); opacity: calc(var(--b, 0) * .85); will-change: opacity; pointer-events: none; }
+.p-disc { scale: calc(1 + var(--k, 0) * .1); }
+.cover[data-react] { scale: calc(1 + var(--k, 0) * .018); }
+.viz-live .eq span { animation: none; }
+.viz-live .eq span:nth-child(1) { transform: scaleY(var(--e1, .3)); }
+.viz-live .eq span:nth-child(2) { transform: scaleY(var(--e2, .3)); }
+.viz-live .eq span:nth-child(3) { transform: scaleY(var(--e3, .3)); }
+.viz-toggle { width: 100%; margin-top: 14px; height: 40px; padding: 0 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--line-3); background: transparent; color: var(--bone); font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; cursor: pointer; }
+.viz-toggle:hover { border-color: var(--lilac); }
+.viz-toggle[hidden] { display: none; }
+.viz-toggle-state { color: var(--lilac); }
+.viz-toggle[aria-pressed="false"] .viz-toggle-state { color: var(--haze); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

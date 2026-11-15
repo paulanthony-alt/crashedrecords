@@ -19,7 +19,7 @@
   var ENTER_STAR = 'M32 1C34 21 43 30 63 32C43 34 34 43 32 63C30 43 21 34 1 32C21 30 30 21 32 1Z';
 
   var MARKUP =
-    '<div class="cri-bloom" aria-hidden="true"><div class="cri-liquid"><div class="cri-marble"></div></div><div class="cri-vignette"></div></div>' +
+    '<div class="cri-bloom" aria-hidden="true"><div class="cri-liquid" data-viz="intro"><div class="cri-marble"></div></div><div class="cri-vignette"></div></div>' +
     '<svg class="cri-grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-grain)"/></svg>' +
     '<div class="cri-stars" aria-hidden="true"></div>' +
     '<div class="cri-spark" aria-hidden="true"><svg viewBox="0 0 40 120"><path d="' + LONG_STAR + '" fill="url(#cr-star)"/></svg></div>' +
@@ -28,7 +28,7 @@
       '<div class="cri-zoom"><div class="cri-logo-wrap">' +
         '<img class="cri-split a" src="' + LOGO_SRC + '" alt="" aria-hidden="true">' +
         '<img class="cri-split b" src="' + LOGO_SRC + '" alt="" aria-hidden="true">' +
-        '<div class="cri-logo-float"><img src="' + LOGO_SRC + '" alt="Crashed Records — shit that makes you float"></div>' +
+        '<div class="cri-logo-float" data-react><img src="' + LOGO_SRC + '" alt="Crashed Records — shit that makes you float"></div>' +
       '</div></div>' +
       '<p class="cri-cue">Put your headphones on</p>' +
       '<button class="cri-enter" type="button" aria-label="Enter Crashed Records">' +
@@ -81,6 +81,7 @@
     clearTimeout(timer);
     markSeen();
     node.classList.add('is-leaving');
+    if (window.CRViz) window.CRViz.refresh();   // hand the reactive canvas back to the page underneath
     document.removeEventListener('keydown', onKey, true);
     setTimeout(function () {
       if (node.parentNode) node.parentNode.removeChild(node);
@@ -136,6 +137,7 @@
     document.body.classList.add('intro-open');
     document.addEventListener('keydown', onKey, true);
     el.querySelector('.cri-enter').focus({ preventScroll: true });
+    if (window.CRViz) window.CRViz.refresh();
   }
 
   function onHome() {

@@ -20,6 +20,7 @@ python3 -m http.server 8000
 | `assets/js/app.js` | Router + page views, cart, checkout, search, forms |
 | `assets/js/player.js` | Persistent player (queue, seek, volume, Media Session) |
 | `assets/js/intro.js` + `assets/css/intro.css` | Enter animation shown on the first home-page visit each session |
+| `assets/js/viz.js` | Reactive visuals: reads the music and drives the liquid-marble canvas and the small pulsing accents |
 | `assets/css/styles.css` | Design tokens + all styles (from the style guide) |
 | `assets/fonts/` | Self-hosted Archivo + JetBrains Mono (OFL, see `LICENSES.txt`) |
 | `assets/img/logo.png` | Logo |
@@ -33,6 +34,7 @@ Hash routing keeps the player playing while you move between pages.
 
 ## What works
 
+- **Reactive visuals**: the backdrops and accents move with the music (see below).
 - **Player**: play any track/album/top-tracks, prev/next, seek, volume, queue panel, spinning disc, lock-screen controls. `Space` plays/pauses, `/` opens search.
 - **Catalog filters** (All / Albums / EPs / Singles), on the home page and the releases page.
 - **Cart**: add merch (with sizes) or a release format, change quantities, see totals and shipping, and go through checkout with validation. The cart is saved in the browser.
@@ -46,6 +48,16 @@ Hash routing keeps the player playing while you move between pages.
 
 - **Intro**: plays once per browser session, and only when someone lands on the home page (deep links skip it). *Skip intro* or `Esc` closes it. *Sound on* starts the music player, which keeps playing after you enter. The footer's *Replay intro* link shows it again.
 - **About** (`#/about`): label story, values and Eric Seides' founder section with a contact form. All of the copy is in `data.js` under `about` and `founder`.
+
+## Reactive visuals
+
+The big backdrops (home, page headers, artist and release pages, the intro) are drawn by one WebGL canvas that moves with whatever is playing: bass swells the liquid warp, mids speed up the flow, highs add veins of light. The logo, the player bar, the cover of the playing record and the little EQ bars pulse too.
+
+- **Silent**, it looks the same as the CSS marble it replaces, which stays in the page as the fallback.
+- **Demo beats** are analysed live. **Real audio files** are fetched once and turned into a small loudness map, so playback is never rerouted and music keeps playing with a phone locked. A file on another domain needs CORS headers to be analysed; without them the visuals fall back to a gentle generic sway.
+- **Slow devices**: the canvas lowers its own resolution until frames are smooth, and browsers with software-only WebGL get the CSS version.
+- **Off switch**: "Reactive visuals" at the bottom of the Queue panel (remembered per browser). It is off automatically for visitors whose device asks for reduced motion.
+- To give another backdrop the effect, add `data-viz` to its marble wrapper; to make an element pulse, add `data-react` and use the `--k` (kick), `--b` (bass) and `--l` (level) CSS variables.
 
 ## Before launch — swap in real content
 

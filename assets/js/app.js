@@ -149,7 +149,7 @@
 
   function pageHero(eb, title, text, hue) {
     return '<section class="page-hero">' +
-      '<div aria-hidden="true" class="cr-liquid page-hero-bg"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + (hue || 0) + 'deg);animation:cr-spin 120s linear infinite"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid page-hero-bg" data-viz="page" data-viz-hue="' + (hue || 0) + '"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + (hue || 0) + 'deg);animation:cr-spin 120s linear infinite"></div></div>' +
       '<div aria-hidden="true" class="page-hero-shade"></div>' +
       '<div class="wrap page-hero-inner">' + eyebrow(eb) + '<h1 class="h-display">' + title + '</h1>' + (text ? '<p class="lede">' + text + '</p>' : '') + '</div></section>';
   }
@@ -169,7 +169,7 @@
     const vidArtist = vid && artistBy[vid.artist];
     return '' +
     '<section class="hero">' +
-      '<div aria-hidden="true" class="cr-liquid hero-bg"><div class="cr-marble hero-marble"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid hero-bg" data-viz="hero"><div class="cr-marble hero-marble"></div></div>' +
       '<div aria-hidden="true" class="hero-vignette"></div>' +
       '<svg aria-hidden="true" class="grain"><rect width="100%" height="100%" filter="url(#cr-grain)"/></svg>' +
       longStar('position:absolute;left:50%;top:90px;width:30px;margin-left:-15px;z-index:2;animation:cr-twinkle 5s ease-in-out infinite') +
@@ -179,7 +179,7 @@
       starSvg('twinkle', 'left:9%;top:70%;width:12px;animation-delay:3s;animation-duration:4.5s', '#E8E1D3') +
       '<svg aria-hidden="true" class="orbit" viewBox="0 0 1200 500"><ellipse cx="600" cy="250" rx="580" ry="190" fill="none" stroke="url(#cr-star)" stroke-width="1.2" stroke-dasharray="2 10"/></svg>' +
       '<div class="hero-center">' +
-        '<h1 class="hero-logo"><img src="assets/img/logo.png" width="612" height="408" alt="Crashed Records — shit that makes you float"></h1>' +
+        '<h1 class="hero-logo" data-react><img src="assets/img/logo.png" width="612" height="408" alt="Crashed Records — shit that makes you float"></h1>' +
         '<p class="hero-text">' + esc(D.label.blurb) + '</p>' +
         '<div class="hero-ctas">' +
           '<a href="#/now-floating" class="btn btn-prism cr-btn">' + ICON.play + 'Enter the float</a>' +
@@ -195,7 +195,7 @@
     '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
       '<div class="nf-art">' +
         '<div aria-hidden="true" class="vinyl-bg"><div class="grooves"></div></div>' +
-        '<a href="#/releases/' + f.slug + '" class="cover cr-card nf-cover" aria-label="' + esc(f.title) + ' — full release">' + art(f, { rot: -80 }) +
+        '<a href="#/releases/' + f.slug + '" class="cover cr-card nf-cover" data-cover="' + f.slug + '" aria-label="' + esc(f.title) + ' — full release">' + art(f, { rot: -80 }) +
           '<div class="cover-foot"><span>' + esc(f.no) + '</span><span>' + esc(f.kind.toUpperCase()) + '</span></div></a>' +
       '</div>' +
       '<div class="nf-info">' +
@@ -332,7 +332,7 @@
     const aShows = shows.filter((s) => s.artists.indexOf(a.slug) > -1);
     const others = artists.filter((x) => x.slug !== a.slug).slice(0, 3);
     return '<section class="artist-hero">' +
-      '<div aria-hidden="true" class="cr-liquid" style="position:absolute;inset:-15%;opacity:.8"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + a.hue + 'deg);animation:cr-spin 110s linear infinite"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid" data-viz="artist" data-viz-hue="' + a.hue + '" style="position:absolute;inset:-15%;opacity:.8"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + a.hue + 'deg);animation:cr-spin 110s linear infinite"></div></div>' +
       '<div aria-hidden="true" class="portrait">' + (a.photo ? '<img src="' + esc(a.photo) + '" alt="">' :
         art(a, { inset: '0', extra: ';opacity:.55' }) + '<div class="portrait-mark">' + longStar('width:34px') + '<span>' + esc(a.name.split(' ').map((w) => w[0]).join('')) + '</span></div>') + '</div>' +
       '<div aria-hidden="true" class="artist-hero-shade"></div>' +
@@ -381,13 +381,13 @@
     const fmtIdx = Math.max(0, r.formats.findIndex((f) => !f.soldOut));
     const out = parseDate(r.date) > today ? 'Out ' : 'Released ';
     return '<div class="release-page">' +
-      '<div aria-hidden="true" class="cr-liquid release-ambient"><div class="cr-marble" style="position:absolute;inset:-20%;filter:hue-rotate(' + r.hue + 'deg) blur(30px);animation:cr-spin 140s linear infinite"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid release-ambient" data-viz="release" data-viz-zoom="1.7" data-viz-hue="' + r.hue + '"><div class="cr-marble" style="position:absolute;inset:-20%;filter:hue-rotate(' + r.hue + 'deg) blur(30px);animation:cr-spin 140s linear infinite"></div></div>' +
       '<div aria-hidden="true" class="release-ambient-shade"></div>' +
       '<div class="wrap release-wrap">' +
       '<section class="release-hero">' +
         '<div class="cr-sleeve" data-sleeve="' + r.slug + '">' +
           '<div aria-hidden="true" class="cr-vinyl"><div class="grooves spin"></div></div>' +
-          '<div class="cover release-cover">' + art(r, { inset: '-20%' }) + '<span class="cover-no" style="left:22px;bottom:18px;font-size:12px">' + esc(r.no) + ' · ' + esc(r.kind.toUpperCase()) + '</span></div>' +
+          '<div class="cover release-cover" data-cover="' + r.slug + '">' + art(r, { inset: '-20%' }) + '<span class="cover-no" style="left:22px;bottom:18px;font-size:12px">' + esc(r.no) + ' · ' + esc(r.kind.toUpperCase()) + '</span></div>' +
         '</div>' +
         '<div class="release-info">' +
           eyebrow('✦ ' + esc(r.kind) + ' · ' + out + fmtLong(r.date)) +
@@ -650,6 +650,7 @@
     }
     if (!samePage) { const v = $('#view'); v.focus({ preventScroll: true }); }
     syncPlayingUI();
+    if (window.CRViz) window.CRViz.refresh();
   }
 
   /* ------------------------------------------------------------------ cart */
@@ -856,6 +857,8 @@
       b.innerHTML = (mine ? ICON.pause : ICON.play) + '<span>' + (mine ? 'Pause' : esc(b.dataset.labelPlay)) + '</span>';
     });
     $$('[data-sleeve]').forEach((s) => s.classList.toggle('spinning', !!(P.playing && t && t.releaseSlug === s.dataset.sleeve)));
+    // covers of the record that is playing pulse with the beat (see viz.js)
+    $$('[data-cover]').forEach((c) => c.toggleAttribute('data-react', !!(P.playing && t && t.releaseSlug === c.dataset.cover)));
   }
 
   /* ------------------------------------------------------------------ toast */
