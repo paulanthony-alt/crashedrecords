@@ -78,6 +78,28 @@ window.CR_DATA = {
     firstRelease: 'The catalog starts with CR—001. The first drop is coming soon.'
   },
 
+  /* ---------- How signing works (About page + Demos page) ----------
+     Written to describe the process only. DRAFT: Eric should read every line and
+     change anything that is not how he actually works. Deal terms (money,
+     ownership, contract length) are deliberately NOT covered; add a question
+     for those once he has decided them. */
+  signing: {
+    replyTime: '',              // for example 'within two weeks'. Leave empty to say nothing about timing.
+    steps: [
+      { title: 'Send your music', text: 'Use the form: two or three of your best tracks as private links, plus a few lines about you.' },
+      { title: 'Eric listens', text: 'Every submission goes straight to Eric. He listens for sound, ideas and where you are headed.' },
+      { title: 'We talk', text: 'If it is a fit, Eric reaches out to talk about your music and what you want from a label.' },
+      { title: 'Make it official', text: 'If you both want to work together, the terms are set out clearly before anything is released.' }
+    ],
+    faq: [
+      { q: 'What kind of music is Crashed looking for?', a: 'Psychedelic hip hop and trap: hazy, heavy, strange, built to make people float. Newer and underground artists are the focus.' },
+      { q: 'Do I need a big following?', a: 'No. Crashed is built around newer and underground artists, so the music comes first.' },
+      { q: 'What should I send?', a: 'Two or three of your best tracks as private streaming links (SoundCloud, Google Drive, Dropbox or an unlisted YouTube video), a short bio and your socials. Please do not attach audio files.' },
+      { q: 'Will I hear back?', a: 'Eric reads submissions himself.{replyTime} If it is a fit, he will reach out.' },
+      { q: 'Does sending music mean I am signed?', a: 'No. Submitting only lets Eric listen. Nothing is agreed until you both say so.' }
+    ]
+  },
+
   /* ---------- About page (#/about) ---------- */
   about: {
     headline: 'Born to <span class="accent">float</span>',   // HTML allowed for the accent

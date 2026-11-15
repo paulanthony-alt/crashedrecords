@@ -567,6 +567,21 @@
   /** Hidden decoy field: people never see or fill it, bots usually do. */
   const HONEYPOT = '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>';
 
+  /** "How signing works" steps + FAQ. `compact` drops the heading call-to-action when it already sits beside a form. */
+  function signingInfo(opts) {
+    const S = D.signing || {};
+    if (!(S.steps && S.steps.length) && !(S.faq && S.faq.length)) return '';
+    const timeText = S.replyTime ? ' He aims to reply ' + esc(S.replyTime) + '.' : '';
+    return '<section id="how-signing-works" class="sec-sm signing" aria-labelledby="hsw-h">' +
+      '<div class="sec-head" style="margin-bottom:32px"><div>' + eyebrow('✦ For artists') + '<h2 id="hsw-h" class="h-section">How signing <span class="accent">works</span></h2></div></div>' +
+      (S.steps && S.steps.length ? '<ol class="steps">' + S.steps.map((st, i) =>
+        '<li><span class="step-no">' + (i + 1) + '</span><h3>' + esc(st.title) + '</h3><p>' + esc(st.text) + '</p></li>').join('') + '</ol>' : '') +
+      (S.faq && S.faq.length ? '<h3 class="h-sub faq-h">Questions</h3><div class="faq">' + S.faq.map((f) =>
+        '<details><summary>' + esc(f.q) + '</summary><p>' + esc(f.a).replace('{replyTime}', timeText) + '</p></details>').join('') + '</div>' : '') +
+      (opts && opts.compact ? '' : '<div class="btn-row" style="margin-top:36px"><a href="#/contact/demos" class="btn btn-prism cr-btn">Submit your music</a></div>') +
+    '</section>';
+  }
+
   /** Shared contact form: used on #/contact/<topic> and the About page (topic "founder"). */
   function contactForm(topic, cls) {
     const id = (k) => 'c-' + topic + '-' + k;
@@ -601,7 +616,7 @@
       contactForm(topic, 'split-main') +
       '<aside class="split-side"><p class="credit-h">Or email directly</p><p class="credit"><a class="u-link" href="mailto:' + esc(D.label.emails[topic]) + '">' + esc(D.label.emails[topic]) + '</a></p>' +
         '<p class="fine" style="margin-top:20px">Sending opens your email app with everything filled in.</p></aside>' +
-      '</div></section></div>' + footerSmall();
+      '</div></section>' + (topic === 'demos' ? signingInfo({ compact: true }) : '') + '</div>' + footerSmall();
   };
 
   /* ---------- about ---------- */
@@ -635,6 +650,8 @@
           '<div class="pillar cr-card"><span class="pillar-no">0' + (i + 1) + '</span>' + starSvg('', 'width:22px') +
           '<h3>' + esc(p.title) + '</h3><p>' + esc(p.text) + '</p></div>').join('') + '</div>' +
       '</section>' +
+
+      signingInfo() +
 
       '<section id="founder" class="founder" aria-labelledby="founder-h">' +
         '<div class="founder-photo">' +
