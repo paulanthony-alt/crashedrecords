@@ -40,7 +40,6 @@
       '</button>' +
     '</div>' +
     '<button class="cri-corner cri-skip" type="button">Skip intro →</button>' +
-    '<button class="cri-corner cri-sound" type="button" aria-pressed="false"><span class="cri-eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="cri-sound-label">Sound off</span></button>' +
     '<div class="cri-warp" aria-hidden="true"><div class="cri-streaks"></div><div class="cri-flash"></div></div>';
 
   var el = null, timer = null, lastFocus = null, soundOn = false;
@@ -69,10 +68,22 @@
 
   function player() { return window.CRPlayer; }
 
-  function setSound(btn, on) {
-    btn.setAttribute('aria-pressed', String(on));
-    btn.querySelector('.cri-sound-label').textContent = on ? 'Sound on' : 'Sound off';
+  /* Sound is always on: the intro drone starts on the visitor's first gesture (browsers block audio before that),
+     and the background track takes over when the intro closes. There is no way to turn it off here. */
+  var gestureOff = null;
+  function startDrone() {
+    if (!window.CRAmbient || window.CRAmbient.active) return;
+    soundOn = window.CRAmbient.start();
   }
+  function listenForGesture() {
+    var go = function () { startDrone(); stopListening(); };
+    gestureOff = function () {
+      ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.removeEventListener(t, go, true); });
+      gestureOff = null;
+    };
+    ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.addEventListener(t, go, true); });
+  }
+  function stopListening() { if (gestureOff) gestureOff(); }
 
   function close() {
     if (!el) return;
@@ -81,12 +92,10 @@
     clearTimeout(timer);
     markSeen();
     node.classList.add('is-leaving');
-    if (soundOn && window.CRAmbient) {
-      soundOn = false;
-      var P0 = player();
-      window.CRAmbient.stop(1.8);                       // the drone fades out...
-      if (P0 && P0.current && !P0.playing) P0.play();    // ...as the first track fades in
-    }
+    stopListening();
+    var P0 = player();
+    if (window.CRAmbient && window.CRAmbient.active) { window.CRAmbient.stop(1.8); soundOn = false; }   // the drone fades out...
+    if (P0 && P0.current && !P0.playing) P0.play();                                               // ...as the background track fades in
     if (window.CRViz) window.CRViz.refresh();   // hand the reactive canvas back to the page underneath
     document.removeEventListener('keydown', onKey, true);
     setTimeout(function () {
@@ -129,17 +138,7 @@
     el.querySelector('.cri-enter').addEventListener('click', enter);
     el.querySelector('.cri-skip').addEventListener('click', close);
 
-    var snd = el.querySelector('.cri-sound');
-    soundOn = false;
-    setSound(snd, false);
-    if (!window.CRAmbient) snd.hidden = true;
-    snd.addEventListener('click', function () {
-      if (!window.CRAmbient) return;
-      // the click is the user gesture browsers need before they will play audio
-      if (soundOn) { window.CRAmbient.stop(0.6); soundOn = false; }
-      else { soundOn = window.CRAmbient.start(); }
-      setSound(snd, soundOn);
-    });
+    listenForGesture();
 
     document.body.appendChild(el);
     document.body.classList.add('intro-open');

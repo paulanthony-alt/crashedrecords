@@ -38,14 +38,14 @@ Hash routing keeps the player playing while you move between pages.
 ## What works
 
 - **Reactive visuals**: the backdrops and accents move with the music (see below).
-- **Intro sound bed**: "Sound on" in the intro plays a generated drone with soft bells, then hands over to the first track (or fades out if there is no music yet).
+- **Intro sound**: sound is always on, with no toggle. The intro plays a generated drone with soft bells from the visitor's first click or key press (browsers block audio before that), then hands over to the background track when the intro closes.
 - **Get signed** (`#/get-signed`): a five-step submission for artists (about them, track links, their sound, what they want, then a review screen with a rights checkbox). Each step is checked before moving on; under-18s must confirm a parent or guardian is OK with it. Answers are saved in the visitor's browser as they type, so they can leave and come back. It sends through `forms.endpoint` (subject `[Get signed] <artist>`) or opens the email app, with the same spam protection as the other forms. The sound tags and options are at the top of the get-signed section in `app.js`; the "Who we're looking for" list is `signing.lookingFor` in `data.js`.
 - **How signing works**: four steps and a short FAQ on the About and Get signed pages (`signing` in `data.js`; a draft for Eric to review).
 - **Float mode**: the expand button in the player opens a full-screen listening room. The reactive visuals fill the screen, the track title pulses with the beat, and the controls fade out while music plays. `Space` play/pause, `←` `→` seek 10 seconds, `F` full screen, `Esc` exit. Only shown once there is music.
 - **Player**: play any track/album/top-tracks, prev/next, seek, volume, queue panel, spinning disc, lock-screen controls. `Space` plays/pauses, `/` opens search.
 - **Catalog filters** (All / Albums / EPs / Singles), on the home page and the releases page.
 - **Cart**: add merch (with sizes) or a release format, change quantities, see totals and shipping, and go through checkout with validation. The cart is saved in the browser.
-- **Background music**: `label.backgroundMusic` in `data.js` (the file is `assets/audio/cashcow.mp3`) leads the player queue on every page. It starts when the intro's *Sound on* is used and the intro is entered. Browsers don't allow audio to start without a visitor action, so it won't start on page load alone. Set `src` to empty to turn it off.
+- **Background music**: `label.backgroundMusic` in `data.js` (the file is `assets/audio/cashcow.mp3`) leads the player queue on every page. It starts when the intro closes (*Enter*, *Skip intro* or `Esc`). Browsers don't allow audio before a visitor action, so it starts on the first click or key press. Set `src` to empty to turn it off.
 - **Follow artist** and **newsletter** sign-up, both saved in the browser.
 - **Search** across artists, releases, tracks, shows and merch.
 - **Contact forms** for booking, press, general and Eric. They validate, then open the visitor's email app with the message filled in.
@@ -54,7 +54,7 @@ Hash routing keeps the player playing while you move between pages.
 
 ## Intro & About
 
-- **Intro**: plays once per browser session, and only when someone lands on the home page (deep links skip it). *Skip intro* or `Esc` closes it. *Sound on* starts the music player, which keeps playing after you enter. The footer's *Replay intro* link shows it again.
+- **Intro**: plays once per browser session, and only when someone lands on the home page (deep links skip it). *Skip intro* or `Esc` closes it. The background track starts as the intro closes and keeps playing after you enter. The footer's *Replay intro* link shows it again.
 - **About** (`#/about`): a full-screen manifesto headline (`about.manifesto.lines`, one entry per line), the numbered manifesto (`about.pillars`), the story, "Who we're looking for", an "Are you next?" band linking to Get signed, how signing works, and Eric's founder section with a contact form. All of the copy is in `data.js` under `about`, `signing` and `founder`.
 
 ## Reactive visuals
