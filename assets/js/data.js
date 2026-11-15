@@ -36,6 +36,36 @@ window.CR_DATA = {
     shipping: { flat: 6, freeOver: 75 }
   },
 
+  /* ---------- Form delivery ----------
+     Until `endpoint` is set, forms open the visitor's email app (they still
+     work, but depend on the visitor having one set up).
+     To receive submissions in your inbox (and keep a log of them), make a free
+     form at Formspree (formspree.io), Formsubmit, Basin or similar, paste its
+     URL below, and every contact / demo / "talk to Eric" form will post there.
+     Any service that accepts a JSON POST works; `extra` is sent with every
+     submission (for example { access_key: '...' } for Web3Forms). */
+  forms: {
+    endpoint: '',
+    extra: {},
+    minFillSeconds: 4,          // submissions faster than this are treated as bots
+    cooldownSeconds: 20         // one submission per form type per visitor in this window
+  },
+
+  /* ---------- Drop alerts (newsletter) ----------
+     Until `endpoint` is set, sign-ups are only saved in the visitor's own
+     browser. To collect real emails, create a form/list at your email service
+     and paste its subscribe URL here:
+       format 'json'  - the service accepts a JSON POST with CORS (Buttondown API, ConvertKit, Beehiiv, most others)
+       format 'form'  - classic HTML form POST (Mailchimp / Buttondown "embed" forms); sent without reading the reply
+     `emailField` is the field name the service expects (usually 'email');
+     `extra` is added to every sign-up (list IDs, tags, API keys that are safe to publish). */
+  newsletter: {
+    endpoint: '',
+    format: 'json',
+    emailField: 'email',
+    extra: {}
+  },
+
   /* ---------- "Founding roster" state ----------
      Shown on the home, Artists and Releases pages until real artists and
      releases are added below. Edit the words freely. */

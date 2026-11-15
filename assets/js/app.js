@@ -366,10 +366,10 @@
         '<h2 id="join-h" class="h-join">Join the drift</h2>' +
         '<p class="join-text">First listens, drop alerts and secret show locations. No spam, only signal.</p>' +
         (joined ? joinedMsg(joined.email) :
-        '<form class="join-form" data-form="newsletter" novalidate>' +
+        '<form class="join-form" data-form="newsletter" data-t0="' + Date.now() + '" novalidate>' +
           '<label for="join-email" class="sr-only">Email address</label>' +
           '<input id="join-email" name="email" type="email" autocomplete="email" placeholder="your@email.com" required>' +
-          '<button type="submit" class="btn btn-bone cr-btn">Float me in</button>' +
+          '<button type="submit" class="btn btn-bone cr-btn">Float me in</button>' + HONEYPOT +
           '<p class="form-error" role="alert"></p>' +
         '</form>') +
       '</div></section>';
@@ -564,11 +564,14 @@
     general: { label: 'General', title: 'Say <span class="accent">hello</span>', intro: 'Anything else on your mind.' },
     founder: { label: 'Eric (Founder)', title: 'Talk to <span class="accent">Eric</span>', intro: 'Reach the founder of Crashed Records directly.' }
   };
+  /** Hidden decoy field: people never see or fill it, bots usually do. */
+  const HONEYPOT = '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>';
+
   /** Shared contact form: used on #/contact/<topic> and the About page (topic "founder"). */
   function contactForm(topic, cls) {
     const id = (k) => 'c-' + topic + '-' + k;
     const field = (k, label, input, opt) => '<div class="field"><label for="' + id(k) + '">' + label + (opt ? ' <span class="opt">(optional)</span>' : '') + '</label>' + input + '<p class="field-error"></p></div>';
-    return '<form class="contact-form ' + (cls || '') + '" data-form="contact" data-topic="' + topic + '" novalidate>' +
+    return '<form class="contact-form ' + (cls || '') + '" data-form="contact" data-topic="' + topic + '" data-t0="' + Date.now() + '" novalidate>' + HONEYPOT +
       '<div class="field-row">' +
         field('name', 'Name', '<input id="' + id('name') + '" name="name" autocomplete="name" required>') +
         field('email', 'Email', '<input id="' + id('email') + '" name="email" type="email" autocomplete="email" required>') +
@@ -966,17 +969,70 @@
     return ok;
   }
 
+  /** POST JSON and resolve on any 2xx; rejects on network errors, timeouts and non-2xx replies. */
+  function postJSON(url, payload) {
+    const ctl = 'AbortController' in window ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), 12000) : 0;
+    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload), signal: ctl ? ctl.signal : undefined })
+      .then((r) => { clearTimeout(timer); if (!r.ok) throw new Error('http ' + r.status); return true; },
+        (err) => { clearTimeout(timer); throw err; });
+  }
+
+  /** Add the visitor to the mailing list (or just remember them on this device when no list is connected yet). */
+  function subscribe(email) {
+    const N = D.newsletter || {};
+    if (!N.endpoint) return Promise.resolve('local');
+    const data = Object.assign({ [N.emailField || 'email']: email }, N.extra || {});
+    if (N.format === 'form') return fetch(N.endpoint, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(data) }).then(() => 'sent');
+    return postJSON(N.endpoint, data).then(() => 'sent');
+  }
+
+  const cooldownLeft = (kind) => {
+    const wait = ((D.forms || {}).cooldownSeconds || 0) * 1000, last = store.get('last:' + kind, 0);
+    return Math.max(0, Math.ceil((last + wait - Date.now()) / 1000));
+  };
+  const markSent = (kind) => store.set('last:' + kind, Date.now());
+  const fillSeconds = (form) => (Date.now() - (+form.dataset.t0 || Date.now())) / 1000;
+
+  const SENT_TEXT = {
+    demos: 'Your music is on its way to Eric. If it is a fit, he will reach out.',
+    founder: 'Your message is on its way to Eric.',
+    booking: 'Your booking request is on its way.',
+    press: 'Your note is on its way to the team.',
+    general: 'Your message is on its way.'
+  };
+  function sentState(form, topic) {
+    const box = document.createElement('div');
+    box.className = 'form-sent'; box.setAttribute('role', 'status');
+    box.innerHTML = '<p class="eyebrow" style="margin:0 0 12px">✦ Sent</p><h3 class="empty-title">Got it.</h3><p class="body-copy">' + esc(SENT_TEXT[topic] || SENT_TEXT.general) + '</p>' +
+      '<div class="btn-row" style="margin-top:20px"><a href="#/" class="btn btn-bone cr-btn">Back home</a><a href="#/releases" class="btn btn-ghost cr-btn">Keep listening</a></div>';
+    form.replaceWith(box);
+    toast('Sent ✦');
+  }
+
   document.addEventListener('submit', (e) => {
     const form = e.target, kind = form.dataset.form;
     if (!kind) return;
     e.preventDefault();
     if (kind === 'newsletter') {
-      const input = form.querySelector('input'), err = form.querySelector('.form-error');
+      const input = form.querySelector('input[type=email]'), err = form.querySelector('.form-error'), btn = form.querySelector('button[type=submit]');
       const v = input.value.trim();
       if (!isEmail(v)) { err.textContent = v ? 'That email doesn\'t look right.' : 'Pop your email in first.'; input.setAttribute('aria-invalid', 'true'); input.focus(); return; }
-      store.set('newsletter', { email: v, at: new Date().toISOString() });
-      form.outerHTML = joinedMsg(v);
-      toast('Welcome to the drift ✦');
+      const trap = form.querySelector('[name=_gotcha]');
+      if (trap && trap.value) { form.outerHTML = joinedMsg(v); return; }                  // bot: pretend it worked, store nothing
+      if (fillSeconds(form) < 1.5) { err.textContent = 'One second, then try again.'; return; }
+      const wait = cooldownLeft('newsletter');
+      if (wait) { err.textContent = 'You just signed up. Give it a few seconds.'; return; }
+      err.textContent = ''; btn.disabled = true; btn.textContent = 'Sending…';
+      subscribe(v).then(() => {
+        markSent('newsletter');
+        store.set('newsletter', { email: v, at: new Date().toISOString() });
+        $$('[data-form=newsletter]').forEach((f) => { f.outerHTML = joinedMsg(v); });
+        toast('Welcome to the drift ✦');
+      }, () => {
+        btn.disabled = false; btn.textContent = 'Float me in';
+        err.textContent = 'We couldn\'t reach the list just now. Please try again in a moment.';
+      });
     }
     if (kind === 'checkout') {
       if (!validate(form)) return;
@@ -990,12 +1046,26 @@
     if (kind === 'contact') {
       if (!validate(form)) return;
       const fd = Object.fromEntries(new FormData(form).entries());
-      const topic = form.dataset.topic;
+      const trap = fd._gotcha; delete fd._gotcha;
+      const topic = form.dataset.topic, status = form.querySelector('.form-status'), F2 = D.forms || {};
+      if (trap) { sentState(form, topic); return; }                                       // bot: pretend it worked, send nothing
+      if (fillSeconds(form) < (F2.minFillSeconds == null ? 4 : F2.minFillSeconds)) { status.textContent = 'That was quick. Give it a second and send again.'; return; }
+      const wait = cooldownLeft('contact');
+      if (wait) { status.textContent = 'You just sent one. Please wait ' + wait + ' seconds before sending another.'; return; }
       const to = D.label.emails[topic] || D.label.emails.general;
       const subject = '[' + CONTACT[topic].label + '] ' + (fd.subject ? fd.subject + ': ' : '') + (fd.artist || fd.outlet || fd.name);
-      const body = Object.entries(fd).filter(([k]) => k !== 'message').map(([k, v]) => k[0].toUpperCase() + k.slice(1) + ': ' + v).join('\n') + '\n\n' + fd.message;
-      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      form.querySelector('.form-status').textContent = '✦ Your email app should open with the message ready. If it didn\'t, write to ' + to + '.';
+      const openEmail = (note) => {
+        const body = Object.entries(fd).filter(([k]) => k !== 'message').map(([k, v]) => k[0].toUpperCase() + k.slice(1) + ': ' + v).join('\n') + '\n\n' + fd.message;
+        window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        status.textContent = note + '✦ Your email app should open with the message ready. If it didn\'t, write to ' + to + '.';
+      };
+      if (!F2.endpoint) { openEmail(''); return; }
+      const btn = form.querySelector('button[type=submit]'), label = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Sending…'; status.textContent = '';
+      postJSON(F2.endpoint, Object.assign({ _subject: subject, topic: CONTACT[topic].label }, fd, F2.extra || {})).then(
+        () => { markSent('contact'); sentState(form, topic); },
+        () => { btn.disabled = false; btn.textContent = label; openEmail('We couldn\'t send that from here, so we\'re using email instead. '); }
+      );
     }
   });
   document.addEventListener('input', (e) => { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target, ''); });
