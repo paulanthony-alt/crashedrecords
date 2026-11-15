@@ -45,6 +45,7 @@ Hash routing keeps the player playing while you move between pages.
 - **Player**: play any track/album/top-tracks, prev/next, seek, volume, queue panel, spinning disc, lock-screen controls. `Space` plays/pauses, `/` opens search.
 - **Catalog filters** (All / Albums / EPs / Singles), on the home page and the releases page.
 - **Cart**: add merch (with sizes) or a release format, change quantities, see totals and shipping, and go through checkout with validation. The cart is saved in the browser.
+- **Background music**: `label.backgroundMusic` in `data.js` (the file is `assets/audio/cashcow.mp3`) leads the player queue on every page. It starts when the intro's *Sound on* is used and the intro is entered. Browsers don't allow audio to start without a visitor action, so it won't start on page load alone. Set `src` to empty to turn it off.
 - **Follow artist** and **newsletter** sign-up, both saved in the browser.
 - **Search** across artists, releases, tracks, shows and merch.
 - **Contact forms** for booking, press, general and Eric. They validate, then open the visitor's email app with the message filled in.
