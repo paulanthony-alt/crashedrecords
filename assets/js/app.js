@@ -57,6 +57,13 @@
   });
   const allTracks = releases.flatMap((r) => r.trackObjs);
   const featured = releaseBy[D.label.featuredRelease] || releases[0];
+  // The background track (data.js label.backgroundMusic) leads the player queue, then the featured release's tracks.
+  const BG = D.label.backgroundMusic || {};
+  const bgTrack = BG.src ? {
+    id: 'background', n: '00', idx: 0, title: BG.title || 'Background music', dur: '', seconds: 0, feat: '', note: '', src: BG.src,
+    releaseSlug: '', releaseTitle: D.label.name, artistName: D.label.name, artistSlug: '', hue: 0, rot: 0, cover: ''
+  } : null;
+  const musicQueue = (bgTrack ? [bgTrack] : []).concat(featured ? featured.trackObjs : []);
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const shows = D.shows.filter((s) => parseDate(s.date) >= today).sort((a, b) => a.date.localeCompare(b.date));
   const showArtists = (s) => s.artists.map((x) => artistBy[x]).filter(Boolean);
@@ -161,7 +168,7 @@
 
   /* ---------- "founding roster" state: no signed artists / releases yet ---------- */
   const F = D.founding || {};
-  const hasMusic = !!featured;
+  const hasMusic = musicQueue.length > 0;
   const submitBtn = '<a href="#/get-signed" class="btn btn-prism cr-btn">Submit your music</a>';
 
   function slotCard(i) {
@@ -1128,8 +1135,8 @@
     PUI.cur = $('.p-cur'); PUI.dur = $('.p-dur'); PUI.queue = $('#queue-list');
     P.setVolume(store.get('volume', 0.8));
     $('.p-vol').value = P.volume;
-    if (!featured) return;                       // no music yet: initMusicless() hides the player
-    P.setQueue(featured.trackObjs, 0, false);
+    if (!musicQueue.length) return;                    // no music yet: initMusicless() hides the player
+    P.setQueue(musicQueue, 0, false);
 
     P.on((type) => {
       if (type === 'track' || type === 'state') { renderPlayer(); renderFloat(); }
@@ -1149,8 +1156,8 @@
     PUI.root.classList.toggle('playing', P.playing);
     PUI.toggle.innerHTML = P.playing ? ICON.pause : ICON.play;
     PUI.toggle.setAttribute('aria-label', P.playing ? 'Pause' : 'Play');
-    PUI.title.textContent = t.title; PUI.title.href = '#/releases/' + t.releaseSlug;
-    PUI.artist.textContent = t.artistName + (t.feat ? ' feat. ' + t.feat : ''); PUI.artist.href = '#/artists/' + t.artistSlug;
+    PUI.title.textContent = t.title; PUI.title.href = t.releaseSlug ? '#/releases/' + t.releaseSlug : '#/';
+    PUI.artist.textContent = t.artistName + (t.feat ? ' feat. ' + t.feat : ''); PUI.artist.href = t.artistSlug ? '#/artists/' + t.artistSlug : '#/';
     $('.p-disc .cr-marble').style.filter = 'hue-rotate(' + (t.hue || 0) + 'deg)';
     PUI.queue.innerHTML = P.queue.map((q, i) => '<li><button type="button" data-action="jump" data-i="' + i + '" class="' + (i === P.index ? 'on' : '') + '"' + (i === P.index ? ' aria-current="true"' : '') + '>' +
       '<span class="track-n">' + (i === P.index && P.playing ? ICON.eq.replace('class="eq"', 'class="eq on"') : pad2(i + 1)) + '</span><span class="q-text"><span>' + esc(q.title) + '</span><span class="muted">' + esc(q.artistName) + '</span></span><span class="track-dur">' + esc(q.dur) + '</span></button></li>').join('');
@@ -1511,9 +1518,9 @@
       case 'sign': closeOverlays(true); location.hash = '#/get-signed'; break;
       case 'listen':
         closeOverlays(true);
-        if (!featured) { location.hash = '#/get-signed'; break; }
-        if (P.current && P.current.releaseSlug === featured.slug) { if (!P.playing) P.play(); }
-        else P.setQueue(featured.trackObjs, 0, true);
+        if (!musicQueue.length) { location.hash = '#/get-signed'; break; }
+        if (sameQueue(musicQueue)) { if (!P.playing) P.play(); }
+        else P.setQueue(musicQueue, 0, true);
         break;
       case 'share': shareLink(el); break;
       case 'float': openFloat(); break;
