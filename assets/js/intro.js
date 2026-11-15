@@ -43,7 +43,7 @@
     '<button class="cri-corner cri-sound" type="button" aria-pressed="false"><span class="cri-eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="cri-sound-label">Sound off</span></button>' +
     '<div class="cri-warp" aria-hidden="true"><div class="cri-streaks"></div><div class="cri-flash"></div></div>';
 
-  var el = null, timer = null, lastFocus = null;
+  var el = null, timer = null, lastFocus = null, soundOn = false;
 
   function seen() { try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) { return false; } }
   function markSeen() { try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) { /* private mode */ } }
@@ -81,6 +81,12 @@
     clearTimeout(timer);
     markSeen();
     node.classList.add('is-leaving');
+    if (soundOn && window.CRAmbient) {
+      soundOn = false;
+      var P0 = player();
+      window.CRAmbient.stop(1.8);                       // the drone fades out...
+      if (P0 && P0.current && !P0.playing) P0.play();    // ...as the first track fades in
+    }
     if (window.CRViz) window.CRViz.refresh();   // hand the reactive canvas back to the page underneath
     document.removeEventListener('keydown', onKey, true);
     setTimeout(function () {
@@ -124,14 +130,15 @@
     el.querySelector('.cri-skip').addEventListener('click', close);
 
     var snd = el.querySelector('.cri-sound');
-    var P = player();
-    if (!P || !P.current) snd.hidden = true;     // nothing to play yet: no sound toggle
-    setSound(snd, !!(P && P.playing));
+    soundOn = false;
+    setSound(snd, false);
+    if (!window.CRAmbient) snd.hidden = true;
     snd.addEventListener('click', function () {
-      var p = player();
-      if (!p) return;
-      if (p.playing) p.pause(); else p.play();   // the click is the user gesture browsers need for audio
-      setSound(snd, p.playing);
+      if (!window.CRAmbient) return;
+      // the click is the user gesture browsers need before they will play audio
+      if (soundOn) { window.CRAmbient.stop(0.6); soundOn = false; }
+      else { soundOn = window.CRAmbient.start(); }
+      setSound(snd, soundOn);
     });
 
     document.body.appendChild(el);

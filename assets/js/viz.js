@@ -150,10 +150,12 @@
 
   function updateSignal(dt, now) {
     var raw = null;
-    if (P.playing && isOn()) {
-      var an = P.analyser(), cur = P.current;
+    var amb = window.CRAmbient && window.CRAmbient.active ? window.CRAmbient.analyser : null;   // the intro's sound bed
+    var useAmb = !!amb && !P.playing;
+    if ((P.playing || useAmb) && isOn()) {
+      var an = useAmb ? amb : P.analyser(), cur = P.current;
       var measured = an ? sampleLive(an) : (cur && cur.src ? sampleEnvelope(cur.src, now) : null);
-      raw = measured ? relative(measured, dt, cur ? cur.id : '') : sampleFallback(now);
+      raw = measured ? relative(measured, dt, useAmb ? 'ambient' : (cur ? cur.id : '')) : sampleFallback(now);
     }
     var b = raw ? raw[0] : 0, m = raw ? raw[1] : 0, h = raw ? raw[2] : 0;
     glide('bass', b, dt, 0.03, 0.22);
@@ -382,7 +384,7 @@
     var rawDt = (now - last) / 1000;
     last = now;
     updateSignal(dt, now);
-    root.classList.toggle('viz-live', P.playing && isOn());
+    root.classList.toggle('viz-live', (P.playing || !!(window.CRAmbient && window.CRAmbient.active)) && isOn());
     accents(now);
     if (!slot || !visible || glState !== 'ok') return;
     adapt(rawDt);
