@@ -31,8 +31,8 @@ window.CR_DATA = {
       youtube: '',
       spotify: ''
     },
-    // Background music: this track is the first in the player queue on every page and starts when the intro's "Sound on" is used.
-    // Browsers only allow audio after a visitor action, so it won't start on its own. Leave src empty to turn it off.
+    // Background music: this track is the first in the player queue on every page. It starts when the intro closes.
+    // Browsers only allow audio after a visitor action, so it starts on the visitor's first click or key press. Leave src empty to turn it off.
     backgroundMusic: { title: 'Cash Cow', src: 'assets/audio/cashcow.mp3' },
     featuredRelease: '',         // slug of the release to feature in "Now floating" and load in the player (empty = first release)
     currency: 'USD',
