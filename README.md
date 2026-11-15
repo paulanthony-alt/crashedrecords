@@ -59,7 +59,10 @@ Hash routing keeps the player playing while you move between pages.
 
 ## Reactive visuals
 
-The big backdrops (home, page headers, artist and release pages, the intro) are drawn by one WebGL canvas that moves with whatever is playing: bass swells the liquid warp, mids speed up the flow, highs add veins of light. The logo, the player bar, the cover of the playing record and the little EQ bars pulse too.
+The big backdrops (home, page headers, artist and release pages, the intro) are drawn by one WebGL canvas that moves with whatever is playing. Bass swells the liquid warp and builds a magenta glow from the centre; each kick or 808 hit punches the marble inward, sends a ripple outward and makes the whole backdrop thump. Mids speed up the flow, highs add veins of light. The logo, the player bar, the cover of the playing record and the little EQ bars pulse too.
+
+- **Intensity**: `visuals.intensity` in `data.js`: `0` calm, `1` default, `2` maximum.
+- **Hits** are found by the low end jumping up within about 150 ms, so long 808s that are still ringing when the next one lands are each counted. Bass also follows the track's absolute level, so quiet intros stay calm.
 
 - **Silent**, it looks the same as the CSS marble it replaces, which stays in the page as the fallback.
 - **Demo beats** are analysed live. **Real audio files** are fetched once and turned into a small loudness map, so playback is never rerouted and music keeps playing with a phone locked. A file on another domain needs CORS headers to be analysed; without them the visuals fall back to a gentle generic sway.

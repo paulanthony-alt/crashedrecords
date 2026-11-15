@@ -636,6 +636,9 @@ legend { padding: 0; margin-bottom: 14px; font-stretch: 125%; font-weight: 900; 
 .viz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 .viz-canvas[data-kind="release"] { inset: 0 0 auto 0; height: 1200px; -webkit-mask-image: linear-gradient(#000 45%, transparent 90%); mask-image: linear-gradient(#000 45%, transparent 90%); }
 .viz-hidden { display: none !important; }            /* the CSS marble the canvas is standing in for */
+/* bass: the backdrop itself thumps on each kick (--vi = visuals.intensity from data.js) */
+.viz-canvas[data-react] { scale: calc(1 + var(--k, 0) * .035 * var(--vi, 1)); }
+.viz-live [data-viz]:not(.viz-hidden) { scale: calc(1 + var(--k, 0) * .05 * var(--vi, 1) + var(--b, 0) * .02 * var(--vi, 1)); filter: url(#cr-liquid) brightness(calc(1 + var(--b, 0) * .25 * var(--vi, 1))); }   /* keeps the liquid warp filter */
 /* accents: --k = kick pulse, --b = bass, --l = overall level (all 0..1, set per element by viz.js) */
 .hero-logo { position: relative; }
 .hero-logo::before { content: ''; position: absolute; inset: 12% 8%; border-radius: 50%; background: radial-gradient(closest-side, rgba(192,38,211,.55), rgba(124,58,237,.25) 55%, transparent); filter: blur(30px); opacity: calc(var(--b, 0) * .7); will-change: opacity; pointer-events: none; }

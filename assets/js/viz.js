@@ -33,11 +33,16 @@
   function writePref(on) { try { localStorage.setItem('cr:viz', on ? 'on' : 'off'); } catch (e) { /* private mode */ } }
 
   var wanted = readPref();                       // the visitor's choice
+  // How hard the bass drives the backdrop: 0 calm, 1 default, 2 maximum (data.js visuals.intensity).
+  var VI = window.CR_DATA && window.CR_DATA.visuals && window.CR_DATA.visuals.intensity;
+  var INT = Math.max(0, Math.min(2, typeof VI === 'number' ? VI : 1));
+  root.style.setProperty('--vi', String(INT));
   function isOn() { return wanted && !reduceMotion.matches; }
 
   /* ====================================================================== 1. SIGNAL */
   var sig = { bass: 0, mid: 0, high: 0, level: 0, kick: 0 };
   var bassAvg = 0;
+  var lowHist = [];                              // [time, absolute bass] over the last ~150ms, for attack detection
   var active = false;                            // true while there is anything to animate
 
   /* ---- live analysis (demo beats) ---- */
@@ -140,6 +145,9 @@
       recent[i] = fresh ? raw[i] : recent[i] + (raw[i] - recent[i]) * k;
       out[i] = Math.min(1, raw[i] / (2 * Math.max(recent[i], 0.03)));
     }
+    // Bass also follows its absolute level, so a quiet intro stays calm and the 808s land hard
+    // (file envelopes are already scaled to the track's own loud parts).
+    out[0] = Math.min(1, 0.35 * out[0] + 0.65 * Math.min(1, raw[0] * 1.15));
     return out;
   }
 
@@ -156,6 +164,7 @@
       var an = useAmb ? amb : P.analyser(), cur = P.current;
       var measured = an ? sampleLive(an) : (cur && cur.src ? sampleEnvelope(cur.src, now) : null);
       raw = measured ? relative(measured, dt, useAmb ? 'ambient' : (cur ? cur.id : '')) : sampleFallback(now);
+      var absB = measured ? Math.min(1, measured[0] * 1.15) : raw[0];
     }
     var b = raw ? raw[0] : 0, m = raw ? raw[1] : 0, h = raw ? raw[2] : 0;
     glide('bass', b, dt, 0.03, 0.22);
@@ -163,8 +172,14 @@
     glide('high', h, dt, 0.03, 0.18);
     glide('level', b * 0.5 + m * 0.3 + h * 0.2, dt, 0.2, 0.6);
     bassAvg += (b - bassAvg) * (1 - Math.exp(-dt / 0.5));
-    var onset = Math.max(0, b - bassAvg * 1.1 - 0.05);
-    sig.kick = Math.max(sig.kick * Math.exp(-dt / 0.17), Math.min(1, onset * 2.4));   // decays smoothly: no strobing
+    // a hit = the low end jumping up within ~150ms (catches 808s whose tails are still ringing), or rising above its average
+    lowHist.push([now, raw ? absB : 0]);
+    while (lowHist.length > 2 && now - lowHist[0][0] > 150) lowHist.shift();     // always keep the previous frame (slow devices)
+    var floor = 1;
+    for (var hi = 0; hi < lowHist.length; hi++) floor = Math.min(floor, lowHist[hi][1]);
+    var attack = Math.max(0, (raw ? absB : 0) - floor - 0.08);
+    var onset = Math.max(attack * 1.4, b - bassAvg * 1.1 - 0.05);
+    sig.kick = Math.max(sig.kick * Math.exp(-dt / 0.2), Math.min(1, onset * (2.4 + 1.4 * INT)));   // decays smoothly: no strobing
     active = !!raw || sig.level > 0.004 || sig.kick > 0.004 || sig.bass > 0.004;
   }
 
@@ -175,7 +190,7 @@
   // (the CSS version uses an SVG feTurbulence 0.006 x 0.011 + feDisplacementMap scale 220).
   var FRAG = [
     '#ifdef GL_FRAGMENT_PRECISION_HIGH', 'precision highp float;', '#else', 'precision mediump float;', '#endif',
-    'uniform vec2 uSize; uniform float uT; uniform float uRot; uniform vec4 uA; uniform float uKick; uniform float uZoom;',
+    'uniform vec2 uSize; uniform float uT; uniform float uRot; uniform vec4 uA; uniform float uKick; uniform float uZoom; uniform float uInt;',
     'varying vec2 vUv;',
     'float hash(vec2 p){ vec3 q = fract(vec3(p.xyx) * .1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }',
     'float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3. - 2. * f);',
@@ -189,10 +204,12 @@
     '  vec2 px = vec2(vUv.x, 1. - vUv.y) * uSize;',
     '  vec2 nq = px * vec2(.006, .011);',
     '  vec2 w = vec2(fbm(nq + vec2(uT * .11, uT * .07)), fbm(nq + vec2(5.2 - uT * .09, 1.3 + uT * .05)));',
-    '  float amp = 220. * (1. + .6 * bass + .3 * uKick);',
-    '  vec2 p = px + (w - .45) * amp;',
+    // bass swells the liquid warp; each kick throws a ripple out from the centre and punches the marble inward
+    '  float amp = 220. * (1. + .6 * bass + .3 * uKick + uInt * (1.1 * bass + 1.2 * uKick));',
+    '  vec2 d = px - .5 * uSize; float r = length(d) / length(uSize);',
+    '  vec2 p = px + (w - .45) * amp + d / (length(d) + 1.) * sin(r * 16. - uT * 4.) * uKick * 90. * uInt;',
     '  vec2 box = uSize * uZoom;',
-    '  vec2 v = (p - .5 * uSize) * (1. - .05 * bass - .035 * uKick);',
+    '  vec2 v = (p - .5 * uSize) * (1. - .05 * bass - .035 * uKick - uInt * (.08 * bass + .13 * uKick));',
     '  float cs = cos(uRot), sn = sin(uRot);',
     '  vec2 u = vec2(cs * v.x + sn * v.y, -sn * v.x + cs * v.y) / box + .5;',
     '  vec3 col = vec3(.078, .043, .141);',                                   // #140B24
@@ -201,8 +218,11 @@
     '  col = blob(col, u, vec2(.62, .78), vec3(.486, .227, .929), .42, box);',  // #7C3AED
     '  col = blob(col, u, vec2(.78, .22), vec3(.310, .275, .898), .38, box);',  // #4F46E5
     '  col = blob(col, u, vec2(.22, .28), vec3(.753, .149, .827), .34, box);',  // #C026D3
-    '  col *= 1. + .10 * lvl + .14 * uKick;',
+    '  col *= 1. + .10 * lvl + .14 * uKick + uInt * (.08 * lvl + .16 * uKick);',
     '  col = mix(col, col * vec3(1.14, .94, 1.08), mid * .5);',
+    // bass: a magenta glow swells from the middle and the colours run hotter
+    '  col = mix(col, col * vec3(1.22, .88, 1.16), bass * .4 * uInt);',
+    '  col += vec3(.75, .15, .83) * bass * bass * .2 * uInt * (1. - smoothstep(0., .7, r));',
     // highs: thin veins of lilac light that run along the liquid warp (smooth, so they stay clean at low resolution)
     '  float veins = pow(1. - abs(sin((w.x - w.y) * 9. + uT * .6)), 6.);',
     '  col += vec3(.79, .66, 1.) * veins * high * .2 * (.3 + dot(col, vec3(.6)));',
@@ -236,7 +256,7 @@
     var loc = gl.getAttribLocation(prog, 'aPos');
     gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     U = {};
-    ['uSize', 'uT', 'uRot', 'uA', 'uKick', 'uZoom'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+    ['uSize', 'uT', 'uRot', 'uA', 'uKick', 'uZoom', 'uInt'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
   }
 
   function initGL() {
@@ -244,6 +264,7 @@
     try {
       canvas = document.createElement('canvas');
       canvas.className = 'viz-canvas';
+      canvas.setAttribute('data-react', '');          // the whole backdrop thumps with the kick (CSS)
       canvas.setAttribute('aria-hidden', 'true');
       var opts = { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false,
         // Software-only WebGL would be slower than the CSS fallback, so refuse it (tests can force it).
@@ -299,6 +320,7 @@
     gl.uniform4f(U.uA, Math.min(1, sig.bass + boost * 0.6), sig.mid, sig.high, Math.min(1, sig.level + boost * 0.5));
     gl.uniform1f(U.uKick, sig.kick);
     gl.uniform1f(U.uZoom, zoom);
+    gl.uniform1f(U.uInt, INT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
@@ -355,7 +377,7 @@
   var targets = [], eqs = [], targetsAt = 0, wroteZero = true;
 
   function findTargets() {
-    targets = Array.prototype.slice.call(document.querySelectorAll('[data-react]'));
+    targets = Array.prototype.slice.call(document.querySelectorAll('[data-react], [data-viz]'));   // [data-viz]: the CSS marble pulses too when WebGL is off
     eqs = Array.prototype.slice.call(document.querySelectorAll('.eq.on, .track.playing .eq, .cri-sound[aria-pressed="true"] .cri-eq'));
   }
 
@@ -392,8 +414,8 @@
     if (!active && (tick & 1)) return;           // nothing playing: the slow drift only needs 30fps
     var warp = slot.closest && slot.closest('.cr-intro.is-entering') ? 1 : 0;   // the intro's warp-out
     var step = active ? dt : dt * 2;
-    flow += step * (0.25 + 1.5 * sig.mid + 1.1 * sig.level + warp * 5);
-    rot += step * (Math.PI * 2 / 90) * (1 + 1.6 * sig.level + warp * 12);
+    flow += step * (0.25 + 1.5 * sig.mid + 1.1 * sig.level + INT * (1.6 * sig.bass + 3 * sig.kick) + warp * 5);   // hits push the liquid forward
+    rot += step * (Math.PI * 2 / 90) * (1 + 1.6 * sig.level + INT * 2.5 * sig.kick + warp * 12);
     draw(warp);
   }
 

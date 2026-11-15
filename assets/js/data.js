@@ -51,6 +51,13 @@ window.CR_DATA = {
     sharePages: false
   },
 
+  /* ---------- Reactive visuals ----------
+     How hard the music (mostly the bass and kick) moves the background:
+     0 = calm, 1 = default, 2 = maximum. Visitors who ask for reduced motion never see it. */
+  visuals: {
+    intensity: 1
+  },
+
   /* ---------- Social posts (home page) ----------
      Paste links to the label's latest TikTok / Instagram / YouTube posts and a
      "Follow the float" section appears on the home page. Empty = hidden.
