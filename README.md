@@ -21,6 +21,9 @@ python3 -m http.server 8000
 | `assets/js/player.js` | Persistent player (queue, seek, volume, Media Session) |
 | `assets/js/intro.js` + `assets/css/intro.css` | Enter animation shown on the first home-page visit each session |
 | `assets/js/viz.js` | Reactive visuals: reads the music and drives the liquid-marble canvas and the small pulsing accents |
+| `assets/js/ambient.js` | The intro's generated drone + bells |
+| `tools/build-share-pages.js` | Writes the link-preview pages in `share/` (see below) |
+| `share/` | Generated link-preview pages (committed) |
 | `assets/css/styles.css` | Design tokens + all styles (from the style guide) |
 | `assets/fonts/` | Self-hosted Archivo + JetBrains Mono (OFL, see `LICENSES.txt`) |
 | `assets/img/logo.png` | Logo |
@@ -35,6 +38,8 @@ Hash routing keeps the player playing while you move between pages.
 ## What works
 
 - **Reactive visuals**: the backdrops and accents move with the music (see below).
+- **Intro sound bed**: "Sound on" in the intro plays a generated drone with soft bells, then hands over to the first track (or fades out if there is no music yet).
+- **How signing works**: four steps and a short FAQ on the About page and under the Demos form (`signing` in `data.js`; a draft for Eric to review).
 - **Player**: play any track/album/top-tracks, prev/next, seek, volume, queue panel, spinning disc, lock-screen controls. `Space` plays/pauses, `/` opens search.
 - **Catalog filters** (All / Albums / EPs / Singles), on the home page and the releases page.
 - **Cart**: add merch (with sizes) or a release format, change quantities, see totals and shipping, and go through checkout with validation. The cart is saved in the browser.
@@ -58,6 +63,23 @@ The big backdrops (home, page headers, artist and release pages, the intro) are 
 - **Slow devices**: the canvas lowers its own resolution until frames are smooth, and browsers with software-only WebGL get the CSS version.
 - **Off switch**: "Reactive visuals" at the bottom of the Queue panel (remembered per browser). It is off automatically for visitors whose device asks for reduced motion.
 - To give another backdrop the effect, add `data-viz` to its marble wrapper; to make an element pulse, add `data-react` and use the `--k` (kick), `--b` (bass) and `--l` (level) CSS variables.
+
+## Forms, spam protection and drop alerts
+
+By default the contact, demo and "Talk to Eric" forms open the visitor's email app, and the newsletter only remembers sign-ups in the visitor's own browser. To receive real submissions, fill in two settings in `assets/js/data.js` (no code changes):
+
+- **`forms.endpoint`**: paste the URL of a free form service (Formspree, Formsubmit, Basin, Web3Forms, etc.). Any service that accepts a JSON POST works; `forms.extra` adds fields such as `{ access_key: '...' }`. If the service is unreachable, the form falls back to the email app instead of losing the message.
+- **`newsletter.endpoint`**: your email service's subscribe URL (`format: 'json'` for services with an API, `'form'` for classic embed forms such as Mailchimp). The site only says "you're in" when the service accepted the address.
+
+Built in against spam: a hidden decoy field (bots fill it, people never see it; bot submissions look successful but send nothing), a minimum fill time (`forms.minFillSeconds`) and a per-visitor cooldown (`forms.cooldownSeconds`). These stop simple bots. They are not a substitute for the spam filtering that Formspree and similar services also provide; turn that on in the service. Cloudflare Turnstile / reCAPTCHA need a server to verify the answer, so they are not included.
+
+Texting alerts (Laylo etc.) need consent wording that should be checked by a lawyer first, so they are not built in.
+
+## Link previews and sharing
+
+Messages, Instagram, X and Discord only read the page before the `#`, so every link into this site would show the same card. `node tools/build-share-pages.js` writes a small page per artist and release (plus About and Get signed) into `share/` with the right title and description, and an instant redirect to the real page. After adding artists or releases: run it, commit `share/`, and set `site.sharePages: true` in `data.js` so the Share buttons on artist and release pages use those links. (`--demo` includes the sample content; `--out dir` writes elsewhere.) Add a `cover` / `photo` image to an artist or release and its preview card uses it; otherwise the label card (`assets/img/og-image.png`) is used. When the site gets its own domain, update `site.url` in `data.js` and the `og:url`, `og:image`, `twitter:image` and `canonical` lines at the top of `index.html`.
+
+The home page's "Follow the float" section shows up when you paste post links into `social.posts` in `data.js` (see the comment there). It uses plain links rather than live embeds, so there are no third-party scripts.
 
 ## Founding roster (no artists yet)
 

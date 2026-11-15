@@ -180,6 +180,22 @@
   }
   const dropAlertsBtn = '<button type="button" class="btn btn-ghost cr-btn" data-action="scroll" data-target="join">Get drop alerts</button>';
 
+  /** Home: latest social posts, pasted in by hand (data.js `social.posts`). Hidden when there are none. */
+  function socialWall() {
+    const posts = ((D.social || {}).posts || []).filter((p) => p && p.url);
+    if (!posts.length) return '';
+    return '<section id="social" aria-labelledby="social-h" class="sec sec-tight">' +
+      '<div class="sec-head"><div>' + eyebrow('✦ Social') + '<h2 id="social-h" class="h-section">Follow the <span class="accent">float</span></h2></div></div>' +
+      '<div class="social-grid">' + posts.slice(0, 4).map((p, i) =>
+        '<a class="social-card cr-card" href="' + esc(p.url) + '" target="_blank" rel="noopener">' +
+          (p.thumb ? '<img class="art-img" src="' + esc(p.thumb) + '" alt="" loading="lazy">' : art({ hue: i * 55, rot: 40 + i * 63 })) +
+          '<div aria-hidden="true" class="fade-bottom"></div>' +
+          '<span class="social-platform">' + esc(p.platform || 'Post') + '</span>' +
+          '<p class="social-caption">' + esc(p.caption || 'Watch') + '</p>' +
+        '</a>').join('') + '</div>' +
+    '</section>';
+  }
+
   /** Home: a short call to artists, placed just above the newsletter. */
   function areYouNext() {
     return '<section aria-labelledby="next-h" class="next-cta">' +
@@ -315,6 +331,7 @@
       '<div class="merch-grid">' + merch.slice(0, 3).map(merchCard).join('') + '</div>' +
     '</section>' +
 
+    socialWall() +
     areYouNext() +
     joinBlock() +
     '</div>' + footerBig();
@@ -410,6 +427,7 @@
         '<div class="btn-row" style="margin-top:12px">' +
           '<button type="button" class="btn btn-prism cr-btn" data-action="play-list" data-list="top" data-label-play="Play top tracks">' + ICON.play + '<span>Play top tracks</span></button>' +
           '<button type="button" class="btn btn-follow" data-action="follow" data-slug="' + a.slug + '" aria-pressed="' + following + '">' + (following ? 'Following ✓' : 'Follow') + '</button>' +
+          '<button type="button" class="btn btn-mono btn-share" data-action="share" data-kind="artists" data-slug="' + a.slug + '" data-title="' + esc(a.name) + '">Share</button>' +
         '</div>' +
       '</div></div></section>' +
       '<div class="wrap">' +
@@ -469,6 +487,7 @@
           '<div class="btn-row" style="margin-top:8px">' +
             '<button type="button" class="btn btn-prism cr-btn" data-action="play-list" data-list="release" data-label-play="Play ' + r.kind.toLowerCase() + '">' + ICON.play + '<span>Play ' + esc(r.kind.toLowerCase()) + '</span></button>' +
             ext(r.links.spotify, 'Spotify', 'btn-mono', 'Spotify link') + ext(r.links.apple, 'Apple Music', 'btn-mono', 'Apple Music link') + ext(r.links.bandcamp, 'Bandcamp', 'btn-mono', 'Bandcamp link') +
+            '<button type="button" class="btn-mono btn-share" data-action="share" data-kind="releases" data-slug="' + r.slug + '" data-title="' + esc(r.title + ' by ' + r.artistObj.name) + '">Share</button>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -1087,6 +1106,20 @@
   });
   document.addEventListener('input', (e) => { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target, ''); });
 
+  /** Share the current artist/release: the phone's share sheet where there is one, otherwise copy the link. */
+  function shareLink(el) {
+    const S = D.site || {};
+    const url = S.sharePages ? new URL('share/' + el.dataset.kind + '/' + el.dataset.slug + '/', location.href.split('#')[0]).href : location.href;
+    const title = el.dataset.title + ' · ' + D.label.name;
+    const copy = () => {
+      const done = () => toast('Link copied ✦');
+      const fail = () => toast('Copy this link: ' + url);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fail); else fail();
+    };
+    if (navigator.share) navigator.share({ title, url }).catch((e) => { if (e && e.name !== 'AbortError') copy(); });
+    else copy();
+  }
+
   /* ------------------------------------------------------------------ actions */
   function sameQueue(list) { return list.length === P.queue.length && list.every((x, i) => P.queue[i].id === x.id); }
   function trackById(id) { return allTracks.find((t) => t.id === id); }
@@ -1187,6 +1220,7 @@
         if (P.current && P.current.releaseSlug === featured.slug) { if (!P.playing) P.play(); }
         else P.setQueue(featured.trackObjs, 0, true);
         break;
+      case 'share': shareLink(el); break;
       case 'soon': toast((el.dataset.what || 'This') + ' is coming soon.'); break;
       case 'scroll': {
         e.preventDefault();

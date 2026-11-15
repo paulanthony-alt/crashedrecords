@@ -36,6 +36,27 @@ window.CR_DATA = {
     shipping: { flat: 6, freeOver: 75 }
   },
 
+  /* ---------- Site address and link previews ----------
+     `url` is where the site lives (change it when you get your own domain; also
+     update the og:url / og:image / canonical lines near the top of index.html).
+     Link previews can't read the part after "#", so tools/build-share-pages.js
+     writes a small page per artist and release into /share. After you have run
+     it and committed the folder, set sharePages to true so the Share buttons
+     use those pages. See the README. */
+  site: {
+    url: 'https://paulanthony-alt.github.io/crashedrecords/',
+    sharePages: false
+  },
+
+  /* ---------- Social posts (home page) ----------
+     Paste links to the label's latest TikTok / Instagram / YouTube posts and a
+     "Follow the float" section appears on the home page. Empty = hidden.
+     { platform: 'TikTok', url: 'https://...', caption: 'short text', thumb: 'assets/img/post-1.jpg' }
+     `thumb` is optional (a marble tile is used without one). */
+  social: {
+    posts: []
+  },
+
   /* ---------- Form delivery ----------
      Until `endpoint` is set, forms open the visitor's email app (they still
      work, but depend on the visitor having one set up).

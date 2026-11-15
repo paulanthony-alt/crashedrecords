@@ -216,5 +216,11 @@
   D.videos = [
     { title: 'Purple Hours', artist: 'lune-vega', youtubeId: '', hue: -30 }
   ];
+  D.social = { posts: [
+    { platform: 'TikTok', url: 'https://www.tiktok.com/', caption: 'Studio session: building the Lucid Static intro' },
+    { platform: 'Instagram', url: 'https://www.instagram.com/', caption: 'Atlanta, thank you. Floating continues.' },
+    { platform: 'YouTube', url: 'https://www.youtube.com/', caption: 'Purple Hours (official video)' },
+    { platform: 'TikTok', url: 'https://www.tiktok.com/', caption: 'Which beat should drop next?' }
+  ] };
   D.merch.splice(2, 0, { id: 'lucid-static-vinyl', name: 'Lucid Static Vinyl', tag: 'Pre-order', price: 32, release: 'cr-008', desc: 'Marbled purple LP. Ships December.', image: '', hue: -40 });
 })();
