@@ -31,9 +31,94 @@ window.CR_DATA = {
       youtube: '',
       spotify: ''
     },
-    featuredRelease: 'cr-008',   // shown in "Now floating" + loaded in the player
+    featuredRelease: '',         // slug of the release to feature in "Now floating" and load in the player (empty = first release)
     currency: 'USD',
     shipping: { flat: 6, freeOver: 75 }
+  },
+
+  /* ---------- Site address and link previews ----------
+     `url` is where the site lives (change it when you get your own domain; also
+     update the og:url / og:image / canonical lines near the top of index.html).
+     Link previews can't read the part after "#", so tools/build-share-pages.js
+     writes a small page per artist and release into /share. After you have run
+     it and committed the folder, set sharePages to true so the Share buttons
+     use those pages. See the README. */
+  site: {
+    url: 'https://paulanthony-alt.github.io/crashedrecords/',
+    sharePages: false
+  },
+
+  /* ---------- Social posts (home page) ----------
+     Paste links to the label's latest TikTok / Instagram / YouTube posts and a
+     "Follow the float" section appears on the home page. Empty = hidden.
+     { platform: 'TikTok', url: 'https://...', caption: 'short text', thumb: 'assets/img/post-1.jpg' }
+     `thumb` is optional (a marble tile is used without one). */
+  social: {
+    posts: []
+  },
+
+  /* ---------- Form delivery ----------
+     Until `endpoint` is set, forms open the visitor's email app (they still
+     work, but depend on the visitor having one set up).
+     To receive submissions in your inbox (and keep a log of them), make a free
+     form at Formspree (formspree.io), Formsubmit, Basin or similar, paste its
+     URL below, and every contact / demo / "talk to Eric" form will post there.
+     Any service that accepts a JSON POST works; `extra` is sent with every
+     submission (for example { access_key: '...' } for Web3Forms). */
+  forms: {
+    endpoint: '',
+    extra: {},
+    minFillSeconds: 4,          // submissions faster than this are treated as bots
+    cooldownSeconds: 20         // one submission per form type per visitor in this window
+  },
+
+  /* ---------- Drop alerts (newsletter) ----------
+     Until `endpoint` is set, sign-ups are only saved in the visitor's own
+     browser. To collect real emails, create a form/list at your email service
+     and paste its subscribe URL here:
+       format 'json'  - the service accepts a JSON POST with CORS (Buttondown API, ConvertKit, Beehiiv, most others)
+       format 'form'  - classic HTML form POST (Mailchimp / Buttondown "embed" forms); sent without reading the reply
+     `emailField` is the field name the service expects (usually 'email');
+     `extra` is added to every sign-up (list IDs, tags, API keys that are safe to publish). */
+  newsletter: {
+    endpoint: '',
+    format: 'json',
+    emailField: 'email',
+    extra: {}
+  },
+
+  /* ---------- "Founding roster" state ----------
+     Shown on the home, Artists and Releases pages until real artists and
+     releases are added below. Edit the words freely. */
+  founding: {
+    kicker: 'Now signing',
+    headline: 'Founding<br><span class="accent">roster</span>',
+    by: 'Psychedelic hip hop & trap · Underground & rising artists',
+    text: 'Crashed is signing its first artists. If your sound is hazy, heavy and strange, built to make people float, send it over. Everything you submit goes straight to Eric.',
+    slots: 4,
+    firstRelease: 'The catalog starts with CR—001. The first drop is coming soon.'
+  },
+
+  /* ---------- How signing works (About page + Demos page) ----------
+     Written to describe the process only. DRAFT: Eric should read every line and
+     change anything that is not how he actually works. Deal terms (money,
+     ownership, contract length) are deliberately NOT covered; add a question
+     for those once he has decided them. */
+  signing: {
+    replyTime: '',              // for example 'within two weeks'. Leave empty to say nothing about timing.
+    steps: [
+      { title: 'Send your music', text: 'Use the form: two or three of your best tracks as private links, plus a few lines about you.' },
+      { title: 'Eric listens', text: 'Every submission goes straight to Eric. He listens for sound, ideas and where you are headed.' },
+      { title: 'We talk', text: 'If it is a fit, Eric reaches out to talk about your music and what you want from a label.' },
+      { title: 'Make it official', text: 'If you both want to work together, the terms are set out clearly before anything is released.' }
+    ],
+    faq: [
+      { q: 'What kind of music is Crashed looking for?', a: 'Psychedelic hip hop and trap: hazy, heavy, strange, built to make people float. Newer and underground artists are the focus.' },
+      { q: 'Do I need a big following?', a: 'No. Crashed is built around newer and underground artists, so the music comes first.' },
+      { q: 'What should I send?', a: 'Two or three of your best tracks as private streaming links (SoundCloud, Google Drive, Dropbox or an unlisted YouTube video), a short bio and your socials. Please do not attach audio files.' },
+      { q: 'Will I hear back?', a: 'Eric reads submissions himself.{replyTime} If it is a fit, he will reach out.' },
+      { q: 'Does sending music mean I am signed?', a: 'No. Submitting only lets Eric listen. Nothing is agreed until you both say so.' }
+    ]
   },
 
   /* ---------- About page (#/about) ---------- */
@@ -65,222 +150,18 @@ window.CR_DATA = {
     socials: { instagram: '' }
   },
 
-  artists: [
-    {
-      slug: 'lune-vega', name: 'Lune Vega', city: 'Atlanta, GA',
-      tags: ['Psychedelic rap', 'Cloud rap', 'Lo-fi'],
-      bio: [
-        'Lune Vega raps like she is narrating a dream she has not woken up from yet. Tape-warped loops, half-time drums and verses that drift in and out of focus.',
-        'Recorded mostly between 2 and 5 a.m., her records are built for headphones and long night drives.'
-      ],
-      photo: '', hue: 40, rot: 47,
-      socials: { instagram: '', youtube: '', spotify: '' }
-    },
-    {
-      slug: 'kosmo-kid', name: 'Kosmo Kid', city: 'Detroit, MI',
-      tags: ['Psych hop', 'Boom bap', 'Space funk'],
-      bio: [
-        'Kosmo Kid digs through dusty space-funk records and flips them into hard-swinging boom bap from orbit.',
-        'Think basement cypher meets planetarium show.'
-      ],
-      photo: '', hue: -40, rot: 94,
-      socials: { instagram: '', youtube: '', spotify: '' }
-    },
-    {
-      slug: 'halo-drip', name: 'Halo Drip', city: 'Los Angeles, CA',
-      tags: ['Cloud rap', 'Trap', 'Ambient'],
-      bio: [
-        'Halo Drip makes trap that melts. 808s under a sky of reverb, hooks you hum for a week.',
-        'A producer first, Halo builds every beat from field recordings of the Pacific.'
-      ],
-      photo: '', hue: 80, rot: 141,
-      socials: { instagram: '', youtube: '', spotify: '' }
-    },
-    {
-      slug: 'saint-static', name: 'Saint Static', city: 'Houston, TX',
-      tags: ['Chopped & screwed', 'Psych rap', 'Noise'],
-      bio: [
-        'Slowed, pitched down and blown out. Saint Static takes the Houston tradition somewhere stranger.',
-        'Live shows are loud, dark and strobe-lit.'
-      ],
-      photo: '', hue: 120, rot: 188,
-      socials: { instagram: '', youtube: '', spotify: '' }
-    },
-    {
-      slug: 'velvet-orbit', name: 'Velvet Orbit', city: 'London, UK',
-      tags: ['Jazz rap', 'Neo-psych', 'Dream hop'],
-      bio: [
-        'A duo of a rapper and a flautist making soft, swirling jazz rap for the comedown.',
-        'Their debut EP was written over one rainy month on a houseboat.'
-      ],
-      photo: '', hue: -80, rot: 235,
-      socials: { instagram: '', youtube: '', spotify: '' }
-    }
-  ],
+  artists: [],
 
-  releases: [
-    {
-      slug: 'cr-008', no: 'CR—008', title: 'Lucid Static', artist: 'lune-vega', kind: 'Album',
-      date: '2026-10-24', hue: -40, rot: 120, cover: '',
-      description: 'Ten tracks recorded half-asleep. A record about the moment right before you drift off — where everything is too bright and too quiet at once.',
-      tracks: [
-        { title: 'Lift Off (Intro)', dur: '1:48' },
-        { title: 'Purple Hours', dur: '3:21', feat: 'Kosmo Kid' },
-        { title: 'Gravity Is A Rumour', dur: '2:58' },
-        { title: 'Halo Over Hwy 85', dur: '3:34' },
-        { title: 'Neon Psalms', dur: '3:05', feat: 'Halo Drip' },
-        { title: 'Soft Landing', dur: '2:41' },
-        { title: 'Comet Tail', dur: '3:12' },
-        { title: '4AM Choir', dur: '1:30', note: 'Interlude' },
-        { title: 'Marble Sky', dur: '3:47' },
-        { title: 'Float On, Crash Down', dur: '4:02' }
-      ],
-      formats: [
-        { name: 'Vinyl LP', desc: 'Marbled purple pressing', price: 32 },
-        { name: 'Cassette', desc: 'Limited run of 200', price: 14 },
-        { name: 'Digital', desc: 'Lossless + MP3', price: 10, digital: true }
-      ],
-      credits: { produced: 'Lune Vega, Halo Drip', mixed: 'Dee Marrow', artwork: 'Studio Nebula' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-007', no: 'CR—007', title: 'Orbit Tapes Vol. 2', artist: 'kosmo-kid', kind: 'EP',
-      date: '2026-07-11', hue: 0, rot: 40, cover: '',
-      description: 'Five more space-funk flips from the basement observatory.',
-      tracks: [
-        { title: 'Re-Entry', dur: '2:44' },
-        { title: 'Moon Boots', dur: '3:09' },
-        { title: 'Satellite Soul', dur: '3:27', feat: 'Velvet Orbit' },
-        { title: 'Zero G Cypher', dur: '2:52' },
-        { title: 'Splashdown', dur: '3:15' }
-      ],
-      formats: [
-        { name: 'Vinyl 12"', desc: 'Glow-in-the-dark pressing', price: 24 },
-        { name: 'Cassette', desc: 'Limited run of 150', price: 12 },
-        { name: 'Digital', desc: 'Lossless + MP3', price: 7, digital: true }
-      ],
-      credits: { produced: 'Kosmo Kid', mixed: 'Kosmo Kid', artwork: 'R. Okafor' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-006', no: 'CR—006', title: 'Pacific Drip', artist: 'halo-drip', kind: 'Single',
-      date: '2026-05-02', hue: 80, rot: 200, cover: '',
-      description: 'A one-track wave. Recorded on the beach at Point Dume, finished in a parked car.',
-      tracks: [
-        { title: 'Pacific Drip', dur: '3:38' },
-        { title: 'Pacific Drip (Slowed)', dur: '4:24' }
-      ],
-      formats: [
-        { name: 'Digital', desc: 'Lossless + MP3', price: 2, digital: true }
-      ],
-      credits: { produced: 'Halo Drip', mixed: 'Dee Marrow', artwork: 'Halo Drip' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-005', no: 'CR—005', title: 'Syrup Cathedral', artist: 'saint-static', kind: 'Album',
-      date: '2026-02-20', hue: 120, rot: 300, cover: '',
-      description: 'Screwed hymns for a city that never cools down.',
-      tracks: [
-        { title: 'Processional', dur: '2:10' },
-        { title: 'Candy Paint Halo', dur: '4:12' },
-        { title: 'Slow Motion Rapture', dur: '3:48', feat: 'Lune Vega' },
-        { title: 'Static Saints', dur: '3:30' },
-        { title: 'Third Coast Ghosts', dur: '4:05' },
-        { title: 'Pitch Black Choir', dur: '1:42', note: 'Interlude' },
-        { title: 'Molasses', dur: '3:56' },
-        { title: 'Benediction (Chopped)', dur: '5:01' }
-      ],
-      formats: [
-        { name: 'Vinyl LP', desc: 'Double LP, cough-syrup purple', price: 36 },
-        { name: 'Cassette', desc: 'Limited run of 200', price: 14 },
-        { name: 'Digital', desc: 'Lossless + MP3', price: 10, digital: true }
-      ],
-      credits: { produced: 'Saint Static, DJ Viscous', mixed: 'Dee Marrow', artwork: 'Studio Nebula' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-004', no: 'CR—004', title: 'Houseboat Hymns', artist: 'velvet-orbit', kind: 'EP',
-      date: '2025-11-07', hue: -80, rot: 160, cover: '',
-      description: 'Soft-focus jazz rap written on the water.',
-      tracks: [
-        { title: 'Low Tide', dur: '2:58' },
-        { title: 'Flute For The Moon', dur: '3:24' },
-        { title: 'Canal Lights', dur: '3:02' },
-        { title: 'Drifting, Mostly', dur: '3:40' }
-      ],
-      formats: [
-        { name: 'Vinyl 12"', desc: 'Clear with purple swirl', price: 24 },
-        { name: 'Digital', desc: 'Lossless + MP3', price: 7, digital: true }
-      ],
-      credits: { produced: 'Velvet Orbit', mixed: 'J. Amari', artwork: 'Velvet Orbit' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-003', no: 'CR—003', title: 'Comet Season', artist: 'lune-vega', kind: 'Single',
-      date: '2025-08-15', hue: 160, rot: 80, cover: '',
-      description: 'The single that started the float.',
-      tracks: [
-        { title: 'Comet Season', dur: '3:16' },
-        { title: 'Comet Season (Instrumental)', dur: '3:16' }
-      ],
-      formats: [
-        { name: 'Vinyl 7"', desc: 'Lilac 7-inch', price: 12 },
-        { name: 'Digital', desc: 'Lossless + MP3', price: 2, digital: true }
-      ],
-      credits: { produced: 'Lune Vega', mixed: 'Dee Marrow', artwork: 'Studio Nebula' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-002', no: 'CR—002', title: 'Orbit Tapes Vol. 1', artist: 'kosmo-kid', kind: 'EP',
-      date: '2025-04-04', hue: 40, rot: 260, cover: '',
-      description: 'The first transmission from the basement observatory.',
-      tracks: [
-        { title: 'Countdown', dur: '1:55' },
-        { title: 'Funk From Saturn', dur: '3:11' },
-        { title: 'Crater Bounce', dur: '2:49' },
-        { title: 'Mission Control', dur: '3:22' }
-      ],
-      formats: [
-        { name: 'Cassette', desc: 'Sold out — digital only', price: 12, soldOut: true },
-        { name: 'Digital', desc: 'Lossless + MP3', price: 6, digital: true }
-      ],
-      credits: { produced: 'Kosmo Kid', mixed: 'Kosmo Kid', artwork: 'R. Okafor' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    },
-    {
-      slug: 'cr-001', no: 'CR—001', title: 'First Crash', artist: 'halo-drip', kind: 'Single',
-      date: '2024-12-06', hue: -120, rot: 20, cover: '',
-      description: 'Catalogue number one. Where it all crashed.',
-      tracks: [
-        { title: 'First Crash', dur: '3:03', feat: 'Saint Static' }
-      ],
-      formats: [
-        { name: 'Digital', desc: 'Lossless + MP3', price: 2, digital: true }
-      ],
-      credits: { produced: 'Halo Drip', mixed: 'Halo Drip', artwork: 'Studio Nebula' },
-      links: { spotify: '', apple: '', bandcamp: '' }
-    }
-  ],
+  releases: [],
 
   // Past dates are hidden automatically.
-  shows: [
-    { date: '2026-11-28', city: 'Atlanta', venue: 'The Masquerade', artists: ['lune-vega', 'halo-drip'], tickets: '' },
-    { date: '2026-12-05', city: 'Detroit', venue: 'El Club', artists: ['kosmo-kid'], tickets: '' },
-    { date: '2026-12-12', city: 'Houston', venue: 'White Oak Music Hall', artists: ['saint-static'], tickets: '' },
-    { date: '2026-12-19', city: 'Los Angeles', venue: 'The Echo', artists: ['halo-drip', 'lune-vega'], tickets: '' },
-    { date: '2027-01-23', city: 'London', venue: 'Jazz Cafe', artists: ['velvet-orbit'], tickets: '' },
-    { date: '2027-02-14', city: 'New York', venue: 'Crashed Label Night — Elsewhere', artists: ['lune-vega', 'kosmo-kid', 'saint-static'], tickets: '' },
-    { date: '2027-03-06', city: 'Chicago', venue: 'Sleeping Village', artists: ['kosmo-kid', 'velvet-orbit'], tickets: '' }
-  ],
+  shows: [],
 
-  videos: [
-    { title: 'Purple Hours', artist: 'lune-vega', youtubeId: '', hue: -30 }
-  ],
+  videos: [],
 
   merch: [
     { id: 'float-tee', name: 'Float Tee', tag: 'New', price: 30, sizes: ['S', 'M', 'L', 'XL', 'XXL'], desc: 'Heavyweight black tee, chrome logo front.', image: '', hue: 0 },
     { id: 'crash-hoodie', name: 'Crash Site Hoodie', tag: 'Limited', price: 65, sizes: ['S', 'M', 'L', 'XL'], desc: 'Garment-dyed violet hoodie, puff print.', image: '', hue: 60 },
-    { id: 'lucid-static-vinyl', name: 'Lucid Static Vinyl', tag: 'Pre-order', price: 32, release: 'cr-008', desc: 'Marbled purple LP. Ships December.', image: '', hue: -40 },
     { id: 'sparkle-beanie', name: 'Sparkle Beanie', tag: 'Restock', price: 25, desc: 'Ribbed knit, embroidered 4-point star.', image: '', hue: 120 },
     { id: 'slipmat', name: 'Marble Slipmat', tag: 'New', price: 18, desc: 'Felt slipmat with the liquid marble print.', image: '', hue: -80 },
     { id: 'sticker-pack', name: 'Sticker Pack', tag: 'Cheap trip', price: 6, desc: 'Eight holographic stickers.', image: '', hue: 160 }

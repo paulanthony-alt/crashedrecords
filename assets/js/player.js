@@ -29,10 +29,16 @@
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) throw new Error('Web Audio not supported');
     const ctx = this.ctx = new AC();
-    this.out = ctx.createGain(); this.out.gain.value = this.volume * 0.55;
+    // voices -> out (fixed mix level) -> compressor -> analyser -> volume -> speakers.
+    // The analyser sits before the volume control so the visuals keep moving at low volume.
+    this.out = ctx.createGain(); this.out.gain.value = 0.55;
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -14; comp.ratio.value = 4;
-    this.out.connect(comp); comp.connect(ctx.destination);
+    this.analyser = ctx.createAnalyser();
+    this.analyser.fftSize = 1024; this.analyser.smoothingTimeConstant = 0.55;
+    this.analyser.minDecibels = -90; this.analyser.maxDecibels = -12;
+    this.vol = ctx.createGain(); this.vol.gain.value = this.volume;
+    this.out.connect(comp); comp.connect(this.analyser); this.analyser.connect(this.vol); this.vol.connect(ctx.destination);
     // shared echo for the sparkles
     this.delay = ctx.createDelay(2); this.fb = ctx.createGain(); this.fb.gain.value = 0.38;
     this.delayOut = ctx.createGain(); this.delayOut.gain.value = 0.5;
@@ -187,7 +193,7 @@
   };
   SynthEngine.prototype.setVolume = function (v) {
     this.volume = v;
-    if (this.out) this.out.gain.value = v * 0.55;
+    if (this.vol) this.vol.gain.value = v;
   };
 
   /* ---------- File engine ---------- */
@@ -214,6 +220,8 @@
     emit(type) { listeners.forEach((fn) => fn(type, this)); },
     get current() { return this.queue[this.index] || null; },
     engine() { const t = this.current; return t && t.src ? this.file : this.synth; },
+    /** Live frequency analyser for the current track, or null (file tracks are analysed ahead of time in viz.js). */
+    analyser() { const t = this.current; return t && !t.src ? (this.synth.analyser || null) : null; },
 
     /** Replace queue and (optionally) start playing at `index`. */
     setQueue(tracks, index, autoplay) {

@@ -149,7 +149,7 @@
 
   function pageHero(eb, title, text, hue) {
     return '<section class="page-hero">' +
-      '<div aria-hidden="true" class="cr-liquid page-hero-bg"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + (hue || 0) + 'deg);animation:cr-spin 120s linear infinite"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid page-hero-bg" data-viz="page" data-viz-hue="' + (hue || 0) + '"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + (hue || 0) + 'deg);animation:cr-spin 120s linear infinite"></div></div>' +
       '<div aria-hidden="true" class="page-hero-shade"></div>' +
       '<div class="wrap page-hero-inner">' + eyebrow(eb) + '<h1 class="h-display">' + title + '</h1>' + (text ? '<p class="lede">' + text + '</p>' : '') + '</div></section>';
   }
@@ -158,18 +158,88 @@
   let lists = {};
   const regList = (key, tracks) => { lists[key] = tracks; return key; };
 
+
+  /* ---------- "founding roster" state: no signed artists / releases yet ---------- */
+  const F = D.founding || {};
+  const hasMusic = !!featured;
+  const submitBtn = '<a href="#/contact/demos" class="btn btn-prism cr-btn">Submit your music</a>';
+
+  function slotCard(i) {
+    const hues = [0, 60, -50, 110, -100, 150];
+    return '<a class="artist-card slot-card cr-card" href="#/contact/demos" aria-label="Open slot ' + (i + 1) + ': submit your music">' +
+      art({ hue: hues[i % hues.length], rot: 47 * (i + 1) }) +
+      '<div aria-hidden="true" class="fade-bottom"></div>' +
+      '<span class="artist-no">A—' + pad2(i + 1) + '</span>' +
+      '<div class="artist-card-body"><p class="artist-card-tag">Open slot</p><p class="artist-card-name">Your name</p></div></a>';
+  }
+  const slotGrid = (n) => '<div class="roster-grid">' + Array.from({ length: n }, (_, i) => slotCard(i)).join('') + '</div>';
+
+  function emptyPanel(no, title, text, actions) {
+    return '<div class="empty-panel"><div class="empty-copy"><p class="eyebrow" style="margin:0 0 12px">' + no + '</p>' +
+      '<h3 class="empty-title">' + title + '</h3><p class="body-copy">' + text + '</p></div><div class="btn-row">' + actions + '</div></div>';
+  }
+  const dropAlertsBtn = '<button type="button" class="btn btn-ghost cr-btn" data-action="scroll" data-target="join">Get drop alerts</button>';
+
+  /** Home: latest social posts, pasted in by hand (data.js `social.posts`). Hidden when there are none. */
+  function socialWall() {
+    const posts = ((D.social || {}).posts || []).filter((p) => p && p.url);
+    if (!posts.length) return '';
+    return '<section id="social" aria-labelledby="social-h" class="sec sec-tight">' +
+      '<div class="sec-head"><div>' + eyebrow('✦ Social') + '<h2 id="social-h" class="h-section">Follow the <span class="accent">float</span></h2></div></div>' +
+      '<div class="social-grid">' + posts.slice(0, 4).map((p, i) =>
+        '<a class="social-card cr-card" href="' + esc(p.url) + '" target="_blank" rel="noopener">' +
+          (p.thumb ? '<img class="art-img" src="' + esc(p.thumb) + '" alt="" loading="lazy">' : art({ hue: i * 55, rot: 40 + i * 63 })) +
+          '<div aria-hidden="true" class="fade-bottom"></div>' +
+          '<span class="social-platform">' + esc(p.platform || 'Post') + '</span>' +
+          '<p class="social-caption">' + esc(p.caption || 'Watch') + '</p>' +
+        '</a>').join('') + '</div>' +
+    '</section>';
+  }
+
+  /** Home: a short call to artists, placed just above the newsletter. */
+  function areYouNext() {
+    return '<section aria-labelledby="next-h" class="next-cta">' +
+      '<div class="next-inner">' +
+        eyebrow('✦ Artists') +
+        '<h2 id="next-h" class="h-section">Are you <span class="accent">next?</span></h2>' +
+        '<p class="body-copy">Crashed is signing underground and rising artists in psychedelic hip hop and trap. Send us your music and we will listen.</p>' +
+        '<div class="btn-row">' +
+          '<a href="#/contact/demos" class="btn btn-prism cr-btn">Get signed</a>' +
+          '<a href="#/about" class="btn btn-ghost cr-btn">How it works</a>' +
+        '</div>' +
+      '</div>' +
+    '</section>';
+  }
+
+  /** Home: the "Now floating" slot becomes "Now signing" until there is a release to feature. */
+  function signingSection() {
+    return '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
+      '<div class="nf-art"><div aria-hidden="true" class="vinyl-bg"><div class="grooves"></div></div>' +
+        '<a href="#/contact/demos" class="cover cr-card nf-cover" aria-label="Submit your music">' + art({ hue: 0, rot: -80 }) +
+          '<div class="cover-foot"><span>CR—001</span><span>OPEN</span></div></a></div>' +
+      '<div class="nf-info"><div class="eyebrow eyebrow-eq">' + ICON.eq.replace('class="eq"', 'class="eq on"') + esc(F.kicker || 'Now signing') + '</div>' +
+        '<h2 id="nf-h" class="nf-title">' + (F.headline || 'Founding<br>roster') + '</h2>' +
+        (F.by ? '<p class="nf-by">' + esc(F.by) + '</p>' : '') +
+        (F.text ? '<p class="body-copy">' + esc(F.text) + '</p>' : '') +
+        '<div class="btn-row">' + submitBtn + '<a href="#/about/founder" class="btn btn-ghost cr-btn">Meet Eric</a></div>' +
+      '</div></section>';
+  }
+
   /* ------------------------------------------------------------------ views */
   const views = {};
 
   views.home = function () {
     const f = featured;
-    regList('featured', f.trackObjs);
-    const marquee = '<span>New drop</span><span class="m-star">✦</span><span class="m-it">' + esc(f.title) + ' — ' + esc(f.artistObj.name) + '</span><span class="m-star">✦</span><span>Out now everywhere</span><span class="m-star">✦</span><span class="m-it">' + esc(D.label.tagline) + '</span><span class="m-star">✦</span>';
+    if (f) regList('featured', f.trackObjs);
+    const star = '<span class="m-star">✦</span>';
+    const marquee = f
+      ? '<span>New drop</span>' + star + '<span class="m-it">' + esc(f.title) + ' — ' + esc(f.artistObj.name) + '</span>' + star + '<span>Out now everywhere</span>' + star + '<span class="m-it">' + esc(D.label.tagline) + '</span>' + star
+      : '<span>Now signing</span>' + star + '<span class="m-it">Psychedelic hip hop &amp; trap</span>' + star + '<span>Founding roster open</span>' + star + '<span class="m-it">' + esc(D.label.tagline) + '</span>' + star;
     const vid = D.videos[0];
     const vidArtist = vid && artistBy[vid.artist];
     return '' +
     '<section class="hero">' +
-      '<div aria-hidden="true" class="cr-liquid hero-bg"><div class="cr-marble hero-marble"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid hero-bg" data-viz="hero"><div class="cr-marble hero-marble"></div></div>' +
       '<div aria-hidden="true" class="hero-vignette"></div>' +
       '<svg aria-hidden="true" class="grain"><rect width="100%" height="100%" filter="url(#cr-grain)"/></svg>' +
       longStar('position:absolute;left:50%;top:90px;width:30px;margin-left:-15px;z-index:2;animation:cr-twinkle 5s ease-in-out infinite') +
@@ -179,11 +249,12 @@
       starSvg('twinkle', 'left:9%;top:70%;width:12px;animation-delay:3s;animation-duration:4.5s', '#E8E1D3') +
       '<svg aria-hidden="true" class="orbit" viewBox="0 0 1200 500"><ellipse cx="600" cy="250" rx="580" ry="190" fill="none" stroke="url(#cr-star)" stroke-width="1.2" stroke-dasharray="2 10"/></svg>' +
       '<div class="hero-center">' +
-        '<h1 class="hero-logo"><img src="assets/img/logo.png" width="612" height="408" alt="Crashed Records — shit that makes you float"></h1>' +
+        '<h1 class="hero-logo" data-react><img src="assets/img/logo.png" width="612" height="408" alt="Crashed Records — shit that makes you float"></h1>' +
         '<p class="hero-text">' + esc(D.label.blurb) + '</p>' +
         '<div class="hero-ctas">' +
           '<a href="#/now-floating" class="btn btn-prism cr-btn">' + ICON.play + 'Enter the float</a>' +
-          '<a href="#/artists" class="btn btn-ghost cr-btn">Meet the roster</a>' +
+          '<a href="#/artists" class="btn btn-ghost cr-btn">' + (artists.length ? 'Meet the roster' : 'Join the roster') + '</a>' +
+          '<a href="#/contact/demos" class="btn btn-bone cr-btn">Get signed</a>' +
         '</div>' +
       '</div>' +
       '<a href="#/now-floating" class="scroll-cue">Drift down<span aria-hidden="true"></span></a>' +
@@ -191,11 +262,11 @@
     '<div aria-hidden="true" class="marquee"><div class="marquee-track">' + marquee + marquee + '</div></div>' +
 
     '<div class="wrap">' +
-    /* NOW FLOATING */
-    '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
+    /* NOW FLOATING (becomes NOW SIGNING until there is a release to feature) */
+    (!f ? signingSection() : '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
       '<div class="nf-art">' +
         '<div aria-hidden="true" class="vinyl-bg"><div class="grooves"></div></div>' +
-        '<a href="#/releases/' + f.slug + '" class="cover cr-card nf-cover" aria-label="' + esc(f.title) + ' — full release">' + art(f, { rot: -80 }) +
+        '<a href="#/releases/' + f.slug + '" class="cover cr-card nf-cover" data-cover="' + f.slug + '" aria-label="' + esc(f.title) + ' — full release">' + art(f, { rot: -80 }) +
           '<div class="cover-foot"><span>' + esc(f.no) + '</span><span>' + esc(f.kind.toUpperCase()) + '</span></div></a>' +
       '</div>' +
       '<div class="nf-info">' +
@@ -210,21 +281,26 @@
           ext(f.links.bandcamp, 'Bandcamp', 'btn-mono btn-52', 'Bandcamp link') +
         '</div>' +
       '</div>' +
-    '</section>' +
+    '</section>') +
 
     /* ROSTER */
     '<section aria-labelledby="roster-h" class="sec">' +
-      '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">Who\'s<br><span class="accent">floating</span> with us</h2></div>' +
-      '<a href="#/artists" class="more-link">All artists →</a></div>' +
-      '<div class="roster-grid">' + artists.slice(0, 4).map((a, i) => artistCard(a, i)).join('') + '</div>' +
+      (artists.length
+        ? '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">Who\'s<br><span class="accent">floating</span> with us</h2></div>' +
+          '<a href="#/artists" class="more-link">All artists →</a></div>' +
+          '<div class="roster-grid">' + artists.slice(0, 4).map((a, i) => artistCard(a, i)).join('') + '</div>'
+        : '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">The first<br><span class="accent">spots</span> are open</h2></div>' +
+          '<a href="#/contact/demos" class="more-link">Submit your music →</a></div>' + slotGrid(F.slots || 4)) +
     '</section>' +
 
     /* CATALOG */
     '<section aria-labelledby="cat-h" class="sec">' +
       '<div class="sec-head"><div>' + eyebrow('✦ Catalog') + '<h2 id="cat-h" class="h-section">The crash site</h2></div>' +
-      filterChips('home') + '</div>' +
-      '<div class="rel-grid" id="home-catalog">' + catalogItems('All', 6) + '</div>' +
-      '<p class="sec-foot"><a href="#/releases" class="more-link">Full catalog →</a></p>' +
+      (releases.length ? filterChips('home') : '') + '</div>' +
+      (releases.length
+        ? '<div class="rel-grid" id="home-catalog">' + catalogItems('All', 6) + '</div>' +
+          '<p class="sec-foot"><a href="#/releases" class="more-link">Full catalog →</a></p>'
+        : emptyPanel('CR—001', 'Reserved for the first release', esc(F.firstRelease || 'The first drop is coming soon.'), dropAlertsBtn)) +
     '</section>' +
 
     /* TRIP LOG */
@@ -234,7 +310,7 @@
         '<p class="body-copy">Label nights, tour stops and listening sessions.</p>' +
         (shows.length > 4 ? '<a href="#/shows" class="more-link" style="margin-top:28px;display:inline-block">All dates →</a>' : '') + '</div>' +
         (shows.length ? '<ul class="shows">' + shows.slice(0, 4).map((s) => showRow(s)).join('') + '</ul>' :
-          '<p class="empty">No dates on the board right now. Join the drift below and we\'ll tell you first.</p>') +
+          '<p class="empty">No dates on the board yet. Join the drift below and we\'ll tell you first.</p>') +
       '</div>' +
     '</section>' +
 
@@ -255,6 +331,8 @@
       '<div class="merch-grid">' + merch.slice(0, 3).map(merchCard).join('') + '</div>' +
     '</section>' +
 
+    socialWall() +
+    areYouNext() +
     joinBlock() +
     '</div>' + footerBig();
   };
@@ -298,17 +376,17 @@
 
   function joinBlock() {
     const joined = store.get('newsletter', null);
-    return '<section aria-labelledby="join-h" class="join">' +
+    return '<section id="join" aria-labelledby="join-h" class="join">' +
       '<div aria-hidden="true" class="cr-liquid" style="position:absolute;inset:-20%;opacity:.55"><div class="cr-marble" style="position:absolute;inset:-20%;animation:cr-spin 100s linear infinite reverse"></div></div>' +
       '<div aria-hidden="true" style="position:absolute;inset:0;background:rgba(7,6,11,.55)"></div>' +
       '<div class="join-inner">' + longStar('width:18px') +
         '<h2 id="join-h" class="h-join">Join the drift</h2>' +
         '<p class="join-text">First listens, drop alerts and secret show locations. No spam, only signal.</p>' +
         (joined ? joinedMsg(joined.email) :
-        '<form class="join-form" data-form="newsletter" novalidate>' +
+        '<form class="join-form" data-form="newsletter" data-t0="' + Date.now() + '" novalidate>' +
           '<label for="join-email" class="sr-only">Email address</label>' +
           '<input id="join-email" name="email" type="email" autocomplete="email" placeholder="your@email.com" required>' +
-          '<button type="submit" class="btn btn-bone cr-btn">Float me in</button>' +
+          '<button type="submit" class="btn btn-bone cr-btn">Float me in</button>' + HONEYPOT +
           '<p class="form-error" role="alert"></p>' +
         '</form>') +
       '</div></section>';
@@ -317,6 +395,11 @@
 
   /* ---------- artists ---------- */
   views.artists = function () {
+    if (!artists.length) {
+      return pageHero('✦ The roster', 'The first <span class="accent">spots</span> are open', 'Nobody is signed yet, which is the point. Crashed is looking for its founding artists: underground and rising names making psychedelic hip hop and trap.', 40) +
+        '<div class="wrap"><section class="sec" style="padding-top:64px">' + slotGrid(F.slots || 4) +
+        '<div class="btn-row" style="margin-top:40px">' + submitBtn + '<a href="#/about/founder" class="btn btn-ghost cr-btn">Meet Eric</a></div></section></div>' + footerSmall();
+    }
     return pageHero('✦ The roster', 'Who\'s <span class="accent">floating</span>', 'Every artist on the label. Tap in, follow, and catch them live.', 40) +
       '<div class="wrap"><section class="sec" style="padding-top:64px"><div class="roster-grid">' + artists.map((a, i) => artistCard(a, i)).join('') + '</div></section></div>' + footerSmall();
   };
@@ -332,7 +415,7 @@
     const aShows = shows.filter((s) => s.artists.indexOf(a.slug) > -1);
     const others = artists.filter((x) => x.slug !== a.slug).slice(0, 3);
     return '<section class="artist-hero">' +
-      '<div aria-hidden="true" class="cr-liquid" style="position:absolute;inset:-15%;opacity:.8"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + a.hue + 'deg);animation:cr-spin 110s linear infinite"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid" data-viz="artist" data-viz-hue="' + a.hue + '" style="position:absolute;inset:-15%;opacity:.8"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(' + a.hue + 'deg);animation:cr-spin 110s linear infinite"></div></div>' +
       '<div aria-hidden="true" class="portrait">' + (a.photo ? '<img src="' + esc(a.photo) + '" alt="">' :
         art(a, { inset: '0', extra: ';opacity:.55' }) + '<div class="portrait-mark">' + longStar('width:34px') + '<span>' + esc(a.name.split(' ').map((w) => w[0]).join('')) + '</span></div>') + '</div>' +
       '<div aria-hidden="true" class="artist-hero-shade"></div>' +
@@ -344,6 +427,7 @@
         '<div class="btn-row" style="margin-top:12px">' +
           '<button type="button" class="btn btn-prism cr-btn" data-action="play-list" data-list="top" data-label-play="Play top tracks">' + ICON.play + '<span>Play top tracks</span></button>' +
           '<button type="button" class="btn btn-follow" data-action="follow" data-slug="' + a.slug + '" aria-pressed="' + following + '">' + (following ? 'Following ✓' : 'Follow') + '</button>' +
+          '<button type="button" class="btn btn-mono btn-share" data-action="share" data-kind="artists" data-slug="' + a.slug + '" data-title="' + esc(a.name) + '">Share</button>' +
         '</div>' +
       '</div></div></section>' +
       '<div class="wrap">' +
@@ -367,6 +451,12 @@
 
   /* ---------- releases ---------- */
   views.releases = function () {
+    if (!releases.length) {
+      return pageHero('✦ Catalog', 'The crash <span class="accent">site</span>', 'Every record we put into orbit will live here, newest first.', -40) +
+        '<div class="wrap"><section class="sec" style="padding-top:56px">' +
+        emptyPanel('CR—001', 'Reserved for the first release', esc(F.firstRelease || 'The first drop is coming soon.'), dropAlertsBtn + '<a href="#/contact/demos" class="btn btn-ghost cr-btn">Submit your music</a>') +
+        '</section>' + joinBlock() + '</div>' + footerSmall();
+    }
     return pageHero('✦ Catalog', 'The crash <span class="accent">site</span>', 'Every record we\'ve put into orbit, newest first.', -40) +
       '<div class="wrap"><section class="sec" style="padding-top:56px">' +
       '<div class="sec-head" style="margin-bottom:32px"><p class="count" id="rel-count">' + releases.length + ' releases</p>' + filterChips('page') + '</div>' +
@@ -381,13 +471,13 @@
     const fmtIdx = Math.max(0, r.formats.findIndex((f) => !f.soldOut));
     const out = parseDate(r.date) > today ? 'Out ' : 'Released ';
     return '<div class="release-page">' +
-      '<div aria-hidden="true" class="cr-liquid release-ambient"><div class="cr-marble" style="position:absolute;inset:-20%;filter:hue-rotate(' + r.hue + 'deg) blur(30px);animation:cr-spin 140s linear infinite"></div></div>' +
+      '<div aria-hidden="true" class="cr-liquid release-ambient" data-viz="release" data-viz-zoom="1.7" data-viz-hue="' + r.hue + '"><div class="cr-marble" style="position:absolute;inset:-20%;filter:hue-rotate(' + r.hue + 'deg) blur(30px);animation:cr-spin 140s linear infinite"></div></div>' +
       '<div aria-hidden="true" class="release-ambient-shade"></div>' +
       '<div class="wrap release-wrap">' +
       '<section class="release-hero">' +
         '<div class="cr-sleeve" data-sleeve="' + r.slug + '">' +
           '<div aria-hidden="true" class="cr-vinyl"><div class="grooves spin"></div></div>' +
-          '<div class="cover release-cover">' + art(r, { inset: '-20%' }) + '<span class="cover-no" style="left:22px;bottom:18px;font-size:12px">' + esc(r.no) + ' · ' + esc(r.kind.toUpperCase()) + '</span></div>' +
+          '<div class="cover release-cover" data-cover="' + r.slug + '">' + art(r, { inset: '-20%' }) + '<span class="cover-no" style="left:22px;bottom:18px;font-size:12px">' + esc(r.no) + ' · ' + esc(r.kind.toUpperCase()) + '</span></div>' +
         '</div>' +
         '<div class="release-info">' +
           eyebrow('✦ ' + esc(r.kind) + ' · ' + out + fmtLong(r.date)) +
@@ -397,6 +487,7 @@
           '<div class="btn-row" style="margin-top:8px">' +
             '<button type="button" class="btn btn-prism cr-btn" data-action="play-list" data-list="release" data-label-play="Play ' + r.kind.toLowerCase() + '">' + ICON.play + '<span>Play ' + esc(r.kind.toLowerCase()) + '</span></button>' +
             ext(r.links.spotify, 'Spotify', 'btn-mono', 'Spotify link') + ext(r.links.apple, 'Apple Music', 'btn-mono', 'Apple Music link') + ext(r.links.bandcamp, 'Bandcamp', 'btn-mono', 'Bandcamp link') +
+            '<button type="button" class="btn-mono btn-share" data-action="share" data-kind="releases" data-slug="' + r.slug + '" data-title="' + esc(r.title + ' by ' + r.artistObj.name) + '">Share</button>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -436,8 +527,8 @@
     return pageHero('✦ Merch', 'Wear the <span class="accent">float</span>', 'Apparel, wax and small objects for the trip. Ships worldwide.', 120) +
       '<div class="wrap"><section class="sec" style="padding-top:56px"><h2 class="h-sub" style="margin-bottom:32px">Merch</h2>' +
       '<div class="merch-grid">' + merch.map(merchCard).join('') + '</div></section>' +
-      '<section class="sec" style="padding-top:0"><div class="sec-head" style="margin-bottom:32px"><h2 class="h-sub" style="margin:0">Records</h2><a href="#/releases" class="more-link">Full catalog →</a></div>' +
-      '<div class="rel-grid wide">' + records.map((r) => releaseCard(r)).join('') + '</div></section></div>' + footerSmall();
+      (records.length ? '<section class="sec" style="padding-top:0"><div class="sec-head" style="margin-bottom:32px"><h2 class="h-sub" style="margin:0">Records</h2><a href="#/releases" class="more-link">Full catalog →</a></div>' +
+      '<div class="rel-grid wide">' + records.map((r) => releaseCard(r)).join('') + '</div></section>' : '') + '</div>' + footerSmall();
   };
 
   /* ---------- checkout ---------- */
@@ -492,11 +583,29 @@
     general: { label: 'General', title: 'Say <span class="accent">hello</span>', intro: 'Anything else on your mind.' },
     founder: { label: 'Eric (Founder)', title: 'Talk to <span class="accent">Eric</span>', intro: 'Reach the founder of Crashed Records directly.' }
   };
+  /** Hidden decoy field: people never see or fill it, bots usually do. */
+  const HONEYPOT = '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>';
+
+  /** "How signing works" steps + FAQ. `compact` drops the heading call-to-action when it already sits beside a form. */
+  function signingInfo(opts) {
+    const S = D.signing || {};
+    if (!(S.steps && S.steps.length) && !(S.faq && S.faq.length)) return '';
+    const timeText = S.replyTime ? ' He aims to reply ' + esc(S.replyTime) + '.' : '';
+    return '<section id="how-signing-works" class="sec-sm signing" aria-labelledby="hsw-h">' +
+      '<div class="sec-head" style="margin-bottom:32px"><div>' + eyebrow('✦ For artists') + '<h2 id="hsw-h" class="h-section">How signing <span class="accent">works</span></h2></div></div>' +
+      (S.steps && S.steps.length ? '<ol class="steps">' + S.steps.map((st, i) =>
+        '<li><span class="step-no">' + (i + 1) + '</span><h3>' + esc(st.title) + '</h3><p>' + esc(st.text) + '</p></li>').join('') + '</ol>' : '') +
+      (S.faq && S.faq.length ? '<h3 class="h-sub faq-h">Questions</h3><div class="faq">' + S.faq.map((f) =>
+        '<details><summary>' + esc(f.q) + '</summary><p>' + esc(f.a).replace('{replyTime}', timeText) + '</p></details>').join('') + '</div>' : '') +
+      (opts && opts.compact ? '' : '<div class="btn-row" style="margin-top:36px"><a href="#/contact/demos" class="btn btn-prism cr-btn">Submit your music</a></div>') +
+    '</section>';
+  }
+
   /** Shared contact form: used on #/contact/<topic> and the About page (topic "founder"). */
   function contactForm(topic, cls) {
     const id = (k) => 'c-' + topic + '-' + k;
     const field = (k, label, input, opt) => '<div class="field"><label for="' + id(k) + '">' + label + (opt ? ' <span class="opt">(optional)</span>' : '') + '</label>' + input + '<p class="field-error"></p></div>';
-    return '<form class="contact-form ' + (cls || '') + '" data-form="contact" data-topic="' + topic + '" novalidate>' +
+    return '<form class="contact-form ' + (cls || '') + '" data-form="contact" data-topic="' + topic + '" data-t0="' + Date.now() + '" novalidate>' + HONEYPOT +
       '<div class="field-row">' +
         field('name', 'Name', '<input id="' + id('name') + '" name="name" autocomplete="name" required>') +
         field('email', 'Email', '<input id="' + id('email') + '" name="email" type="email" autocomplete="email" required>') +
@@ -526,7 +635,7 @@
       contactForm(topic, 'split-main') +
       '<aside class="split-side"><p class="credit-h">Or email directly</p><p class="credit"><a class="u-link" href="mailto:' + esc(D.label.emails[topic]) + '">' + esc(D.label.emails[topic]) + '</a></p>' +
         '<p class="fine" style="margin-top:20px">Sending opens your email app with everything filled in.</p></aside>' +
-      '</div></section></div>' + footerSmall();
+      '</div></section>' + (topic === 'demos' ? signingInfo({ compact: true }) : '') + '</div>' + footerSmall();
   };
 
   /* ---------- about ---------- */
@@ -545,9 +654,9 @@
           '<aside class="split-side about-facts">' +
             '<dl>' +
               '<div><dt>Founded by</dt><dd><a href="#/about/founder" data-action="scroll" data-target="founder">' + esc(F.name) + '</a></dd></div>' +
-              '<div><dt>Sound</dt><dd>Psychedelic hip hop &amp; rap</dd></div>' +
-              '<div><dt>Roster</dt><dd><a href="#/artists">' + artists.length + ' artist' + (artists.length === 1 ? '' : 's') + '</a></dd></div>' +
-              '<div><dt>Catalog</dt><dd><a href="#/releases">' + releases.length + ' release' + (releases.length === 1 ? '' : 's') + '</a></dd></div>' +
+              '<div><dt>Sound</dt><dd>Psychedelic hip hop &amp; trap</dd></div>' +
+              '<div><dt>Roster</dt><dd><a href="#/artists">' + (artists.length ? artists.length + ' artist' + (artists.length === 1 ? '' : 's') : 'Founding spots open') + '</a></dd></div>' +
+              '<div><dt>Catalog</dt><dd><a href="#/releases">' + (releases.length ? releases.length + ' release' + (releases.length === 1 ? '' : 's') : 'First drop coming') + '</a></dd></div>' +
               '<div><dt>Status</dt><dd class="status"><span class="status-dot" aria-hidden="true"></span>Accepting demos</dd></div>' +
             '</dl>' +
           '</aside>' +
@@ -560,6 +669,8 @@
           '<div class="pillar cr-card"><span class="pillar-no">0' + (i + 1) + '</span>' + starSvg('', 'width:22px') +
           '<h3>' + esc(p.title) + '</h3><p>' + esc(p.text) + '</p></div>').join('') + '</div>' +
       '</section>' +
+
+      signingInfo() +
 
       '<section id="founder" class="founder" aria-labelledby="founder-h">' +
         '<div class="founder-photo">' +
@@ -631,7 +742,7 @@
     if (!samePage) {
       $('#view').innerHTML = html;
       document.body.dataset.view = nav || 'page';
-      if (nav === 'home') regList('featured', featured.trackObjs);
+      if (nav === 'home' && featured) regList('featured', featured.trackObjs);
     }
     currentPath = path;
     document.title = title + ' · ' + D.label.name;
@@ -650,6 +761,7 @@
     }
     if (!samePage) { const v = $('#view'); v.focus({ preventScroll: true }); }
     syncPlayingUI();
+    if (window.CRViz) window.CRViz.refresh();
   }
 
   /* ------------------------------------------------------------------ cart */
@@ -805,6 +917,7 @@
     PUI.cur = $('.p-cur'); PUI.dur = $('.p-dur'); PUI.queue = $('#queue-list');
     P.setVolume(store.get('volume', 0.8));
     $('.p-vol').value = P.volume;
+    if (!featured) return;                       // no music yet: initMusicless() hides the player
     P.setQueue(featured.trackObjs, 0, false);
 
     P.on((type) => {
@@ -856,6 +969,8 @@
       b.innerHTML = (mine ? ICON.pause : ICON.play) + '<span>' + (mine ? 'Pause' : esc(b.dataset.labelPlay)) + '</span>';
     });
     $$('[data-sleeve]').forEach((s) => s.classList.toggle('spinning', !!(P.playing && t && t.releaseSlug === s.dataset.sleeve)));
+    // covers of the record that is playing pulse with the beat (see viz.js)
+    $$('[data-cover]').forEach((c) => c.toggleAttribute('data-react', !!(P.playing && t && t.releaseSlug === c.dataset.cover)));
   }
 
   /* ------------------------------------------------------------------ toast */
@@ -890,17 +1005,70 @@
     return ok;
   }
 
+  /** POST JSON and resolve on any 2xx; rejects on network errors, timeouts and non-2xx replies. */
+  function postJSON(url, payload) {
+    const ctl = 'AbortController' in window ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), 12000) : 0;
+    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload), signal: ctl ? ctl.signal : undefined })
+      .then((r) => { clearTimeout(timer); if (!r.ok) throw new Error('http ' + r.status); return true; },
+        (err) => { clearTimeout(timer); throw err; });
+  }
+
+  /** Add the visitor to the mailing list (or just remember them on this device when no list is connected yet). */
+  function subscribe(email) {
+    const N = D.newsletter || {};
+    if (!N.endpoint) return Promise.resolve('local');
+    const data = Object.assign({ [N.emailField || 'email']: email }, N.extra || {});
+    if (N.format === 'form') return fetch(N.endpoint, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(data) }).then(() => 'sent');
+    return postJSON(N.endpoint, data).then(() => 'sent');
+  }
+
+  const cooldownLeft = (kind) => {
+    const wait = ((D.forms || {}).cooldownSeconds || 0) * 1000, last = store.get('last:' + kind, 0);
+    return Math.max(0, Math.ceil((last + wait - Date.now()) / 1000));
+  };
+  const markSent = (kind) => store.set('last:' + kind, Date.now());
+  const fillSeconds = (form) => (Date.now() - (+form.dataset.t0 || Date.now())) / 1000;
+
+  const SENT_TEXT = {
+    demos: 'Your music is on its way to Eric. If it is a fit, he will reach out.',
+    founder: 'Your message is on its way to Eric.',
+    booking: 'Your booking request is on its way.',
+    press: 'Your note is on its way to the team.',
+    general: 'Your message is on its way.'
+  };
+  function sentState(form, topic) {
+    const box = document.createElement('div');
+    box.className = 'form-sent'; box.setAttribute('role', 'status');
+    box.innerHTML = '<p class="eyebrow" style="margin:0 0 12px">✦ Sent</p><h3 class="empty-title">Got it.</h3><p class="body-copy">' + esc(SENT_TEXT[topic] || SENT_TEXT.general) + '</p>' +
+      '<div class="btn-row" style="margin-top:20px"><a href="#/" class="btn btn-bone cr-btn">Back home</a><a href="#/releases" class="btn btn-ghost cr-btn">Keep listening</a></div>';
+    form.replaceWith(box);
+    toast('Sent ✦');
+  }
+
   document.addEventListener('submit', (e) => {
     const form = e.target, kind = form.dataset.form;
     if (!kind) return;
     e.preventDefault();
     if (kind === 'newsletter') {
-      const input = form.querySelector('input'), err = form.querySelector('.form-error');
+      const input = form.querySelector('input[type=email]'), err = form.querySelector('.form-error'), btn = form.querySelector('button[type=submit]');
       const v = input.value.trim();
       if (!isEmail(v)) { err.textContent = v ? 'That email doesn\'t look right.' : 'Pop your email in first.'; input.setAttribute('aria-invalid', 'true'); input.focus(); return; }
-      store.set('newsletter', { email: v, at: new Date().toISOString() });
-      form.outerHTML = joinedMsg(v);
-      toast('Welcome to the drift ✦');
+      const trap = form.querySelector('[name=_gotcha]');
+      if (trap && trap.value) { form.outerHTML = joinedMsg(v); return; }                  // bot: pretend it worked, store nothing
+      if (fillSeconds(form) < 1.5) { err.textContent = 'One second, then try again.'; return; }
+      const wait = cooldownLeft('newsletter');
+      if (wait) { err.textContent = 'You just signed up. Give it a few seconds.'; return; }
+      err.textContent = ''; btn.disabled = true; btn.textContent = 'Sending…';
+      subscribe(v).then(() => {
+        markSent('newsletter');
+        store.set('newsletter', { email: v, at: new Date().toISOString() });
+        $$('[data-form=newsletter]').forEach((f) => { f.outerHTML = joinedMsg(v); });
+        toast('Welcome to the drift ✦');
+      }, () => {
+        btn.disabled = false; btn.textContent = 'Float me in';
+        err.textContent = 'We couldn\'t reach the list just now. Please try again in a moment.';
+      });
     }
     if (kind === 'checkout') {
       if (!validate(form)) return;
@@ -914,15 +1082,43 @@
     if (kind === 'contact') {
       if (!validate(form)) return;
       const fd = Object.fromEntries(new FormData(form).entries());
-      const topic = form.dataset.topic;
+      const trap = fd._gotcha; delete fd._gotcha;
+      const topic = form.dataset.topic, status = form.querySelector('.form-status'), F2 = D.forms || {};
+      if (trap) { sentState(form, topic); return; }                                       // bot: pretend it worked, send nothing
+      if (fillSeconds(form) < (F2.minFillSeconds == null ? 4 : F2.minFillSeconds)) { status.textContent = 'That was quick. Give it a second and send again.'; return; }
+      const wait = cooldownLeft('contact');
+      if (wait) { status.textContent = 'You just sent one. Please wait ' + wait + ' seconds before sending another.'; return; }
       const to = D.label.emails[topic] || D.label.emails.general;
       const subject = '[' + CONTACT[topic].label + '] ' + (fd.subject ? fd.subject + ': ' : '') + (fd.artist || fd.outlet || fd.name);
-      const body = Object.entries(fd).filter(([k]) => k !== 'message').map(([k, v]) => k[0].toUpperCase() + k.slice(1) + ': ' + v).join('\n') + '\n\n' + fd.message;
-      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      form.querySelector('.form-status').textContent = '✦ Your email app should open with the message ready. If it didn\'t, write to ' + to + '.';
+      const openEmail = (note) => {
+        const body = Object.entries(fd).filter(([k]) => k !== 'message').map(([k, v]) => k[0].toUpperCase() + k.slice(1) + ': ' + v).join('\n') + '\n\n' + fd.message;
+        window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        status.textContent = note + '✦ Your email app should open with the message ready. If it didn\'t, write to ' + to + '.';
+      };
+      if (!F2.endpoint) { openEmail(''); return; }
+      const btn = form.querySelector('button[type=submit]'), label = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Sending…'; status.textContent = '';
+      postJSON(F2.endpoint, Object.assign({ _subject: subject, topic: CONTACT[topic].label }, fd, F2.extra || {})).then(
+        () => { markSent('contact'); sentState(form, topic); },
+        () => { btn.disabled = false; btn.textContent = label; openEmail('We couldn\'t send that from here, so we\'re using email instead. '); }
+      );
     }
   });
   document.addEventListener('input', (e) => { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target, ''); });
+
+  /** Share the current artist/release: the phone's share sheet where there is one, otherwise copy the link. */
+  function shareLink(el) {
+    const S = D.site || {};
+    const url = S.sharePages ? new URL('share/' + el.dataset.kind + '/' + el.dataset.slug + '/', location.href.split('#')[0]).href : location.href;
+    const title = el.dataset.title + ' · ' + D.label.name;
+    const copy = () => {
+      const done = () => toast('Link copied ✦');
+      const fail = () => toast('Copy this link: ' + url);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fail); else fail();
+    };
+    if (navigator.share) navigator.share({ title, url }).catch((e) => { if (e && e.name !== 'AbortError') copy(); });
+    else copy();
+  }
 
   /* ------------------------------------------------------------------ actions */
   function sameQueue(list) { return list.length === P.queue.length && list.every((x, i) => P.queue[i].id === x.id); }
@@ -1017,11 +1213,14 @@
       case 'open-menu': openLayer('mobile-menu'); el.setAttribute('aria-expanded', 'true'); break;
       case 'close': closeOverlays(); break;
       case 'video': openVideo(+el.dataset.i); break;
+      case 'sign': closeOverlays(true); location.hash = '#/contact/demos'; break;
       case 'listen':
         closeOverlays(true);
+        if (!featured) { location.hash = '#/contact/demos'; break; }
         if (P.current && P.current.releaseSlug === featured.slug) { if (!P.playing) P.play(); }
         else P.setQueue(featured.trackObjs, 0, true);
         break;
+      case 'share': shareLink(el); break;
       case 'soon': toast((el.dataset.what || 'This') + ' is coming soon.'); break;
       case 'scroll': {
         e.preventDefault();
@@ -1068,6 +1267,12 @@
   $('#search-results').addEventListener('click', (e) => { if (e.target.closest('a')) closeOverlays(true); });
   window.addEventListener('hashchange', route);
   initPlayerUI();
+  if (!hasMusic) {
+    // Nothing to play yet: hide the player and point the "Listen" buttons at the submission form.
+    document.body.classList.add('no-music');
+    const dock = $('.player-dock'); if (dock) dock.hidden = true;
+    $$('[data-action="listen"]').forEach((b) => { b.dataset.action = 'sign'; b.textContent = b.classList.contains('btn') ? 'Submit your music' : 'Submit music'; });
+  }
   renderCartUI();
   route();
 })();

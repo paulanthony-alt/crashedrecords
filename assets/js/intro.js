@@ -19,7 +19,7 @@
   var ENTER_STAR = 'M32 1C34 21 43 30 63 32C43 34 34 43 32 63C30 43 21 34 1 32C21 30 30 21 32 1Z';
 
   var MARKUP =
-    '<div class="cri-bloom" aria-hidden="true"><div class="cri-liquid"><div class="cri-marble"></div></div><div class="cri-vignette"></div></div>' +
+    '<div class="cri-bloom" aria-hidden="true"><div class="cri-liquid" data-viz="intro"><div class="cri-marble"></div></div><div class="cri-vignette"></div></div>' +
     '<svg class="cri-grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-grain)"/></svg>' +
     '<div class="cri-stars" aria-hidden="true"></div>' +
     '<div class="cri-spark" aria-hidden="true"><svg viewBox="0 0 40 120"><path d="' + LONG_STAR + '" fill="url(#cr-star)"/></svg></div>' +
@@ -28,7 +28,7 @@
       '<div class="cri-zoom"><div class="cri-logo-wrap">' +
         '<img class="cri-split a" src="' + LOGO_SRC + '" alt="" aria-hidden="true">' +
         '<img class="cri-split b" src="' + LOGO_SRC + '" alt="" aria-hidden="true">' +
-        '<div class="cri-logo-float"><img src="' + LOGO_SRC + '" alt="Crashed Records — shit that makes you float"></div>' +
+        '<div class="cri-logo-float" data-react><img src="' + LOGO_SRC + '" alt="Crashed Records — shit that makes you float"></div>' +
       '</div></div>' +
       '<p class="cri-cue">Put your headphones on</p>' +
       '<button class="cri-enter" type="button" aria-label="Enter Crashed Records">' +
@@ -43,7 +43,7 @@
     '<button class="cri-corner cri-sound" type="button" aria-pressed="false"><span class="cri-eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="cri-sound-label">Sound off</span></button>' +
     '<div class="cri-warp" aria-hidden="true"><div class="cri-streaks"></div><div class="cri-flash"></div></div>';
 
-  var el = null, timer = null, lastFocus = null;
+  var el = null, timer = null, lastFocus = null, soundOn = false;
 
   function seen() { try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) { return false; } }
   function markSeen() { try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) { /* private mode */ } }
@@ -81,6 +81,13 @@
     clearTimeout(timer);
     markSeen();
     node.classList.add('is-leaving');
+    if (soundOn && window.CRAmbient) {
+      soundOn = false;
+      var P0 = player();
+      window.CRAmbient.stop(1.8);                       // the drone fades out...
+      if (P0 && P0.current && !P0.playing) P0.play();    // ...as the first track fades in
+    }
+    if (window.CRViz) window.CRViz.refresh();   // hand the reactive canvas back to the page underneath
     document.removeEventListener('keydown', onKey, true);
     setTimeout(function () {
       if (node.parentNode) node.parentNode.removeChild(node);
@@ -123,19 +130,22 @@
     el.querySelector('.cri-skip').addEventListener('click', close);
 
     var snd = el.querySelector('.cri-sound');
-    var P = player();
-    setSound(snd, !!(P && P.playing));
+    soundOn = false;
+    setSound(snd, false);
+    if (!window.CRAmbient) snd.hidden = true;
     snd.addEventListener('click', function () {
-      var p = player();
-      if (!p) return;
-      if (p.playing) p.pause(); else p.play();   // the click is the user gesture browsers need for audio
-      setSound(snd, p.playing);
+      if (!window.CRAmbient) return;
+      // the click is the user gesture browsers need before they will play audio
+      if (soundOn) { window.CRAmbient.stop(0.6); soundOn = false; }
+      else { soundOn = window.CRAmbient.start(); }
+      setSound(snd, soundOn);
     });
 
     document.body.appendChild(el);
     document.body.classList.add('intro-open');
     document.addEventListener('keydown', onKey, true);
     el.querySelector('.cri-enter').focus({ preventScroll: true });
+    if (window.CRViz) window.CRViz.refresh();
   }
 
   function onHome() {
