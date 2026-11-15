@@ -105,6 +105,13 @@ window.CR_DATA = {
      ownership, contract length) are deliberately NOT covered; add a question
      for those once he has decided them. */
   signing: {
+    // Shown on the Get signed page and the About page. DRAFT: Eric should check these.
+    lookingFor: [
+      'Psychedelic hip hop and trap: hazy, heavy, strange',
+      'Newer and underground artists. No following needed',
+      'A sound of your own, not a copy of the charts',
+      'Artists who think about the whole world: visuals, shows, the vibe'
+    ],
     replyTime: '',              // for example 'within two weeks'. Leave empty to say nothing about timing.
     steps: [
       { title: 'Send your music', text: 'Use the form: two or three of your best tracks as private links, plus a few lines about you.' },
@@ -123,16 +130,23 @@ window.CR_DATA = {
 
   /* ---------- About page (#/about) ---------- */
   about: {
-    headline: 'Born to <span class="accent">float</span>',   // HTML allowed for the accent
+    headline: 'Born to <span class="accent">float</span>',   // HTML allowed for the accent (used when manifesto is empty)
+    // The giant headline at the top of the About page: one entry per line, HTML allowed for the accent.
+    manifesto: {
+      kicker: '✦ About Crashed',
+      lines: ['We sign the <span class="accent">strange</span> ones.', 'The hazy. The heavy.', 'The ones that make you <span class="accent">float</span>.']
+    },
     intro: 'Crashed Records is a brand-new independent label for psychedelic hip hop & rap: records built for headphones, late nights and leaving the ground for a while.',
     story: [
       'Crashed started with a simple idea: the strangest, most immersive corners of rap deserve a home that treats them like art, not content. Hazy loops, warped samples, voices that drift in and out of focus. Music that makes you float.',
       'We are just getting started. That means a small roster, a lot of care, and room for artists to shape what this label becomes. Every release gets real attention, from the mix to the artwork to the pressing.',
       'If you make music that sounds like it came from the other side of the sky, we want to hear it.'
     ],
+    // "The manifesto": big numbered statements under the headline.
     pillars: [
-      { title: 'Artist first', text: 'Fair deals, clear communication, and creative control that stays with the people making the music.' },
-      { title: 'Sound over trends', text: 'We sign records we would play on repeat, not whatever the algorithm wants this week.' },
+      { title: 'Sound over numbers', text: 'We sign records we would play on repeat. Followers, streams and trends come second.' },
+      { title: 'Underground first', text: 'Crashed is built around newer and underground artists, the ones right before everyone else catches on.' },
+      { title: 'Artist first', text: 'Clear communication, terms set out up front, and creative control that stays with the people making the music.' },
       { title: 'Built from zero', text: 'A young, independent label growing one release at a time, with our community along for the ride.' }
     ]
   },
@@ -143,8 +157,8 @@ window.CR_DATA = {
     role: 'Founder',
     photo: 'assets/img/eric-seides.jpg',
     bio: [
-      'Eric founded Crashed Records to build the label he always wanted to exist: a home for psychedelic hip hop and rap that takes the music, and the artists behind it, seriously.',
-      'He runs the label day to day, from A&R and artist development to releases and shows. If you want to work with Crashed, he is the person to talk to.'
+      'Eric is a producer first. He started Crashed Records to build the label he always wanted to exist: a home for psychedelic hip hop and trap that takes the music, and the artists behind it, seriously.',
+      'He runs the label day to day, from finding artists and shaping their sound to releases and shows. If you want to work with Crashed, he is the person to talk to.'
     ],
     email: 'ericdanielseides@gmail.com',
     socials: { instagram: '' }

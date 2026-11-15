@@ -61,7 +61,7 @@ const pages = [];
   });
 });
 pages.push({ dir: 'about', hash: '#/about', title: 'About · ' + label, desc: D.about.intro, image: DEFAULT_IMAGE });
-pages.push({ dir: 'get-signed', hash: '#/contact/demos', title: 'Get signed · ' + label, desc: 'Send your music to ' + label + '. We are signing underground and rising artists in psychedelic hip hop and trap.', image: DEFAULT_IMAGE });
+pages.push({ dir: 'get-signed', hash: '#/get-signed', title: 'Get signed · ' + label, desc: 'Send your music to ' + label + '. We are signing underground and rising artists in psychedelic hip hop and trap.', image: DEFAULT_IMAGE });
 
 function html(p) {
   const url = site + outName.replace(/\\/g, '/') + '/' + p.dir + '/';

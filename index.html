@@ -57,7 +57,7 @@
       <a href="#/visuals" data-nav="visuals">Visuals</a>
       <a href="#/shop" data-nav="merch">Merch</a>
       <a href="#/about" data-nav="about">About</a>
-      <a href="#/contact/demos" class="nav-cta" data-nav="contact">Get signed</a>
+      <a href="#/get-signed" class="nav-cta" data-nav="signed">Get signed</a>
     </div>
     <div class="nav-actions">
       <button type="button" aria-label="Search" class="cr-star-btn" data-action="open-search">
@@ -99,6 +99,7 @@
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 010 6"/></svg>
       <input class="p-vol range" type="range" min="0" max="1" step="0.01" value="0.8">
     </label>
+    <button type="button" class="p-queue-btn p-float-btn" data-action="float" aria-label="Float mode: full-screen listening"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="hide-sm">Float</span></button>
     <button type="button" class="p-queue-btn" data-action="queue" aria-expanded="false" aria-controls="queue">Queue</button>
     <div id="queue" class="queue" hidden>
       <p class="credit-h">Playing from <span class="queue-from"></span></p>
@@ -109,6 +110,32 @@
 </div>
 
 <!-- ============ OVERLAYS ============ -->
+<div id="float" class="layer layer-float" role="dialog" aria-modal="true" aria-label="Float mode" hidden>
+  <div aria-hidden="true" class="cr-liquid float-bg" data-viz="float" data-viz-zoom="1.5"><div class="cr-marble float-marble"></div></div>
+  <div aria-hidden="true" class="float-shade"></div>
+  <div class="float-top">
+    <p class="eyebrow">✦ Float mode</p>
+    <div class="float-tools">
+      <button type="button" class="float-btn f-fs" data-action="float-fs">Full screen</button>
+      <button type="button" class="float-btn" data-action="close">Exit <kbd>Esc</kbd></button>
+    </div>
+  </div>
+  <div class="float-center" data-react>
+    <p class="float-release"></p>
+    <h2 class="float-title"></h2>
+    <p class="float-artist"></p>
+  </div>
+  <div class="float-bottom">
+    <div class="float-progress"><span class="f-cur">0:00</span><input class="f-seek range" type="range" min="0" max="1" step="0.001" value="0" aria-label="Seek"><span class="f-dur">0:00</span></div>
+    <div class="float-controls">
+      <button type="button" class="f-skip" data-action="prev" aria-label="Previous track"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/></svg></button>
+      <button type="button" class="f-toggle" data-action="toggle" data-autofocus aria-label="Play"></button>
+      <button type="button" class="f-skip" data-action="next" aria-label="Next track"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"/></svg></button>
+    </div>
+    <p class="float-hint">Space play / pause · ← → seek · F full screen · Esc exit</p>
+  </div>
+</div>
+
 <div id="search" class="layer layer-search" role="dialog" aria-modal="true" aria-label="Search" hidden>
   <div class="layer-backdrop"></div>
   <div class="search-panel">
@@ -154,8 +181,8 @@
       <a href="#/visuals" data-nav="visuals">Visuals</a>
       <a href="#/shop" data-nav="merch">Merch</a>
       <a href="#/about" data-nav="about">About</a>
-      <a href="#/contact/demos" data-nav="contact">Get signed</a>
-      <a href="#/contact/demos" data-nav="contact">Contact</a>
+      <a href="#/get-signed" data-nav="signed">Get signed</a>
+      <a href="#/contact/general" data-nav="contact">Contact</a>
     </nav>
     <div class="menu-foot">
       <button type="button" class="btn btn-prism" data-action="listen">Listen now</button>
