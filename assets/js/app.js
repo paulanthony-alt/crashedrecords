@@ -137,7 +137,7 @@
     return '<footer class="footer-big"><div class="footer-inner">' +
       '<div class="footer-brand"><span class="footer-word">CRASHED</span><span class="footer-records">Records</span><p class="footer-tag">' + esc(L.tagline) + '</p></div>' +
       '<nav aria-label="Footer" class="footer-nav">' +
-      '<div><span class="footer-h">Label</span><a href="#/artists">Artists</a><a href="#/releases">Releases</a><a href="#/shows">Trip Log</a><a href="#/about">About</a><a href="#/contact/demos">Demos</a></div>' +
+      '<div><span class="footer-h">Label</span><a href="#/artists">Artists</a><a href="#/releases">Releases</a><a href="#/shows">Trip Log</a><a href="#/about">About</a><a href="#/get-signed">Demos</a></div>' +
       '<div><span class="footer-h">Follow</span>' + ext(L.socials.instagram, 'Instagram', 'footer-link', 'Instagram') + ext(L.socials.tiktok, 'TikTok', 'footer-link', 'TikTok') + ext(L.socials.youtube, 'YouTube', 'footer-link', 'YouTube') + ext(L.socials.spotify, 'Spotify', 'footer-link', 'Spotify') + '</div>' +
       '<div><span class="footer-h">Contact</span><a href="#/about/contact">Contact Eric</a><a href="#/contact/booking">Booking</a><a href="#/contact/press">Press</a><a href="mailto:' + esc(L.emails.general) + '">' + esc(L.emails.general) + '</a></div>' +
       '</nav></div><p class="footer-copy">© ' + new Date().getFullYear() + ' ' + esc(L.name) + ' · <button type="button" class="footer-link footer-replay" data-action="replay-intro">Replay intro</button></p></footer>';
@@ -162,11 +162,11 @@
   /* ---------- "founding roster" state: no signed artists / releases yet ---------- */
   const F = D.founding || {};
   const hasMusic = !!featured;
-  const submitBtn = '<a href="#/contact/demos" class="btn btn-prism cr-btn">Submit your music</a>';
+  const submitBtn = '<a href="#/get-signed" class="btn btn-prism cr-btn">Submit your music</a>';
 
   function slotCard(i) {
     const hues = [0, 60, -50, 110, -100, 150];
-    return '<a class="artist-card slot-card cr-card" href="#/contact/demos" aria-label="Open slot ' + (i + 1) + ': submit your music">' +
+    return '<a class="artist-card slot-card cr-card" href="#/get-signed" aria-label="Open slot ' + (i + 1) + ': submit your music">' +
       art({ hue: hues[i % hues.length], rot: 47 * (i + 1) }) +
       '<div aria-hidden="true" class="fade-bottom"></div>' +
       '<span class="artist-no">A—' + pad2(i + 1) + '</span>' +
@@ -204,7 +204,7 @@
         '<h2 id="next-h" class="h-section">Are you <span class="accent">next?</span></h2>' +
         '<p class="body-copy">Crashed is signing underground and rising artists in psychedelic hip hop and trap. Send us your music and we will listen.</p>' +
         '<div class="btn-row">' +
-          '<a href="#/contact/demos" class="btn btn-prism cr-btn">Get signed</a>' +
+          '<a href="#/get-signed" class="btn btn-prism cr-btn">Get signed</a>' +
           '<a href="#/about" class="btn btn-ghost cr-btn">How it works</a>' +
         '</div>' +
       '</div>' +
@@ -215,7 +215,7 @@
   function signingSection() {
     return '<section id="now-floating" aria-labelledby="nf-h" class="now-floating">' +
       '<div class="nf-art"><div aria-hidden="true" class="vinyl-bg"><div class="grooves"></div></div>' +
-        '<a href="#/contact/demos" class="cover cr-card nf-cover" aria-label="Submit your music">' + art({ hue: 0, rot: -80 }) +
+        '<a href="#/get-signed" class="cover cr-card nf-cover" aria-label="Submit your music">' + art({ hue: 0, rot: -80 }) +
           '<div class="cover-foot"><span>CR—001</span><span>OPEN</span></div></a></div>' +
       '<div class="nf-info"><div class="eyebrow eyebrow-eq">' + ICON.eq.replace('class="eq"', 'class="eq on"') + esc(F.kicker || 'Now signing') + '</div>' +
         '<h2 id="nf-h" class="nf-title">' + (F.headline || 'Founding<br>roster') + '</h2>' +
@@ -254,7 +254,7 @@
         '<div class="hero-ctas">' +
           '<a href="#/now-floating" class="btn btn-prism cr-btn">' + ICON.play + 'Enter the float</a>' +
           '<a href="#/artists" class="btn btn-ghost cr-btn">' + (artists.length ? 'Meet the roster' : 'Join the roster') + '</a>' +
-          '<a href="#/contact/demos" class="btn btn-bone cr-btn">Get signed</a>' +
+          '<a href="#/get-signed" class="btn btn-bone cr-btn">Get signed</a>' +
         '</div>' +
       '</div>' +
       '<a href="#/now-floating" class="scroll-cue">Drift down<span aria-hidden="true"></span></a>' +
@@ -290,7 +290,7 @@
           '<a href="#/artists" class="more-link">All artists →</a></div>' +
           '<div class="roster-grid">' + artists.slice(0, 4).map((a, i) => artistCard(a, i)).join('') + '</div>'
         : '<div class="sec-head"><div>' + eyebrow('✦ The roster') + '<h2 id="roster-h" class="h-section">The first<br><span class="accent">spots</span> are open</h2></div>' +
-          '<a href="#/contact/demos" class="more-link">Submit your music →</a></div>' + slotGrid(F.slots || 4)) +
+          '<a href="#/get-signed" class="more-link">Submit your music →</a></div>' + slotGrid(F.slots || 4)) +
     '</section>' +
 
     /* CATALOG */
@@ -454,7 +454,7 @@
     if (!releases.length) {
       return pageHero('✦ Catalog', 'The crash <span class="accent">site</span>', 'Every record we put into orbit will live here, newest first.', -40) +
         '<div class="wrap"><section class="sec" style="padding-top:56px">' +
-        emptyPanel('CR—001', 'Reserved for the first release', esc(F.firstRelease || 'The first drop is coming soon.'), dropAlertsBtn + '<a href="#/contact/demos" class="btn btn-ghost cr-btn">Submit your music</a>') +
+        emptyPanel('CR—001', 'Reserved for the first release', esc(F.firstRelease || 'The first drop is coming soon.'), dropAlertsBtn + '<a href="#/get-signed" class="btn btn-ghost cr-btn">Submit your music</a>') +
         '</section>' + joinBlock() + '</div>' + footerSmall();
     }
     return pageHero('✦ Catalog', 'The crash <span class="accent">site</span>', 'Every record we\'ve put into orbit, newest first.', -40) +
@@ -597,7 +597,7 @@
         '<li><span class="step-no">' + (i + 1) + '</span><h3>' + esc(st.title) + '</h3><p>' + esc(st.text) + '</p></li>').join('') + '</ol>' : '') +
       (S.faq && S.faq.length ? '<h3 class="h-sub faq-h">Questions</h3><div class="faq">' + S.faq.map((f) =>
         '<details><summary>' + esc(f.q) + '</summary><p>' + esc(f.a).replace('{replyTime}', timeText) + '</p></details>').join('') + '</div>' : '') +
-      (opts && opts.compact ? '' : '<div class="btn-row" style="margin-top:36px"><a href="#/contact/demos" class="btn btn-prism cr-btn">Submit your music</a></div>') +
+      (opts && opts.compact ? '' : '<div class="btn-row" style="margin-top:36px"><a href="#/get-signed" class="btn btn-prism cr-btn">Submit your music</a></div>') +
     '</section>';
   }
 
@@ -630,7 +630,7 @@
     return pageHero('✦ Contact', c.title, c.intro, -120) +
       '<div class="wrap"><section class="sec contact" style="padding-top:56px">' +
       '<nav aria-label="Contact topic" class="chips" style="margin-bottom:40px">' + Object.keys(CONTACT).map((k) =>
-        '<a class="chip" href="#/contact/' + k + '"' + (k === topic ? ' aria-current="page"' : '') + '>' + CONTACT[k].label + '</a>').join('') + '</nav>' +
+        '<a class="chip" href="' + (k === 'demos' ? '#/get-signed' : '#/contact/' + k) + '"' + (k === topic ? ' aria-current="page"' : '') + '>' + CONTACT[k].label + '</a>').join('') + '</nav>' +
       '<div class="split" style="padding:0;gap:64px">' +
       contactForm(topic, 'split-main') +
       '<aside class="split-side"><p class="credit-h">Or email directly</p><p class="credit"><a class="u-link" href="mailto:' + esc(D.label.emails[topic]) + '">' + esc(D.label.emails[topic]) + '</a></p>' +
@@ -638,14 +638,215 @@
       '</div></section>' + (topic === 'demos' ? signingInfo({ compact: true }) : '') + '</div>' + footerSmall();
   };
 
+
+  /* ---------- get signed: a guided, step-by-step submission ---------- */
+  const SIGN_STEPS = ['You', 'Your music', 'Your sound', 'What you want', 'Send'];
+  const SIGN_TAGS = ['Psychedelic trap', 'Rage', 'Plugg', 'Cloud rap', 'Hyperpop', 'Experimental', 'Hazy / lo-fi', 'Melodic', 'Dark', 'Something else'];
+  const SIGN_STAGES = ['Just starting out', 'Under 1k monthly listeners', '1k–10k monthly listeners', '10k–100k monthly listeners', '100k+ monthly listeners'];
+  const SIGN_WANTS = ['Releasing my music', 'Production / beats', 'Mixing & mastering', 'Artwork & visuals', 'Shows', 'Growing my audience'];
+  const SIGN_LABELS = { artist: 'Artist name', name: 'Name', email: 'Email', city: 'City', age: 'Age', guardian: 'Guardian OK', link1: 'Track 1', link2: 'Track 2', link3: 'Track 3',
+    instagram: 'Instagram', tiktok: 'TikTok', streaming: 'Streaming page', sound: 'Sound', soundsLike: 'Sounds like', stage: 'Stage', wants: 'Wants', message: 'About', rights: 'Rights confirmed' };
+
+  function lookingForList(cls) {
+    const L = (D.signing || {}).lookingFor || [];
+    return L.length ? '<ul class="' + cls + '">' + L.map((t) => '<li>' + starSvg('', 'width:14px;flex:none') + '<span>' + esc(t) + '</span></li>').join('') + '</ul>' : '';
+  }
+
+  views.getSigned = function () {
+    const F = D.founder, first = F.name.split(' ')[0], to = D.label.emails.demos || D.label.emails.general;
+    const id = (k) => 'gs-' + k;
+    const field = (k, label, input, opt, hint) => '<div class="field"><label for="' + id(k) + '">' + label + (opt ? ' <span class="opt">(optional)</span>' : '') + '</label>' + input +
+      (hint ? '<p class="field-hint">' + hint + '</p>' : '') + '<p class="field-error"></p></div>';
+    const inp = (k, attrs) => '<input id="' + id(k) + '" name="' + k + '" ' + (attrs || '') + '>';
+    const sel = (k, opts, attrs) => '<select id="' + id(k) + '" name="' + k + '" ' + (attrs || '') + '><option value="">Choose…</option>' + opts.map((o) => '<option>' + esc(o) + '</option>').join('') + '</select>';
+    const checks = (name, opts, labelId, label, opt) => '<div class="field"><p class="gs-label" id="' + labelId + '">' + label + (opt ? ' <span class="opt">(optional)</span>' : '') + '</p>' +
+      '<div class="tag-grid" role="group" aria-labelledby="' + labelId + '">' + opts.map((o) => '<label class="tag-check"><input type="checkbox" name="' + name + '" value="' + esc(o) + '"><span>' + esc(o) + '</span></label>').join('') + '</div><p class="field-error"></p></div>';
+    const tick = (k, text) => '<div class="field"><label class="check-line"><input type="checkbox" id="' + id(k) + '" name="' + k + '" value="yes"><span>' + text + '</span></label><p class="field-error"></p></div>';
+    const step = (n, title, sub, body) => '<fieldset class="gs-step" data-step="' + n + '"' + (n ? ' hidden' : '') + '>' +
+      '<legend class="sr-only">Step ' + (n + 1) + ' of ' + SIGN_STEPS.length + ': ' + SIGN_STEPS[n] + '</legend>' +
+      '<p class="eyebrow gs-count">Step ' + (n + 1) + ' / ' + SIGN_STEPS.length + ' · ' + SIGN_STEPS[n] + '</p>' +
+      '<h2 class="gs-title" tabindex="-1">' + title + '</h2>' + (sub ? '<p class="gs-sub">' + sub + '</p>' : '') + body + '</fieldset>';
+
+    const form = '<form id="sign-flow" class="gs-form split-main" data-form="signup" data-t0="' + Date.now() + '" novalidate>' + HONEYPOT +
+      '<ol class="gs-progress" aria-label="Progress">' + SIGN_STEPS.map((s, i) =>
+        '<li data-i="' + i + '"><button type="button" data-gs="go" data-i="' + i + '" disabled><span class="gs-n">' + pad2(i + 1) + '</span><span class="gs-name">' + s + '</span></button></li>').join('') + '</ol>' +
+      step(0, 'Who <span class="accent">are you?</span>', 'The basics, so ' + esc(first) + ' knows who he is listening to.',
+        '<div class="field-row">' + field('artist', 'Artist name', inp('artist', 'required autocomplete="off"')) + field('name', 'Your name', inp('name', 'autocomplete="name"'), true) + '</div>' +
+        '<div class="field-row">' + field('email', 'Email', inp('email', 'type="email" autocomplete="email" required')) + field('city', 'City / country', inp('city', 'autocomplete="address-level2"'), true) + '</div>' +
+        '<div class="field-row">' + field('age', 'Age', sel('age', ['18 or over', 'Under 18'], 'required')) + '<div class="field gs-spacer" aria-hidden="true"></div></div>' +
+        '<div class="gs-guardian" hidden>' + tick('guardian', 'A parent or guardian knows I am sending this and is OK with it.') + '</div>') +
+      step(1, 'Let him <span class="accent">hear it</span>', 'Two or three of your best tracks as private links: SoundCloud, Google Drive, Dropbox or an unlisted YouTube video. No attachments.',
+        field('link1', 'Your best track', inp('link1', 'type="url" placeholder="https://" required')) +
+        '<div class="field-row">' + field('link2', 'Second track', inp('link2', 'type="url" placeholder="https://"'), true) + field('link3', 'Third track', inp('link3', 'type="url" placeholder="https://"'), true) + '</div>' +
+        '<div class="field-row">' + field('instagram', 'Instagram', inp('instagram', 'placeholder="@handle" autocomplete="off"'), true) + field('tiktok', 'TikTok', inp('tiktok', 'placeholder="@handle" autocomplete="off"'), true) + '</div>' +
+        field('streaming', 'Spotify / Apple Music page', inp('streaming', 'type="url" placeholder="https://"'), true)) +
+      step(2, 'What does it <span class="accent">sound like?</span>', 'Pick everything that fits. There are no wrong answers.',
+        checks('sound', SIGN_TAGS, 'gs-sound-l', 'Your sound') +
+        '<div class="field-row">' + field('soundsLike', 'Sounds like', inp('soundsLike', 'placeholder="Artists people compare you to" autocomplete="off"'), true) + field('stage', 'Where you are right now', sel('stage', SIGN_STAGES), true) + '</div>') +
+      step(3, 'What do you <span class="accent">want?</span>', 'What would help you most from a label right now?',
+        checks('wants', SIGN_WANTS, 'gs-wants-l', 'Looking for', true) +
+        field('message', 'Tell ' + esc(first) + ' about you', '<textarea id="' + id('message') + '" name="message" rows="6" required></textarea>', false, 'Where you are from, how you make your music, what you are working on next.')) +
+      step(4, 'Ready to <span class="accent">send?</span>', 'Check it over. You can go back and change anything.',
+        '<div class="gs-review"></div>' +
+        tick('rights', 'This is my music (or I have the rights to share it), and I understand that sending it does not mean I am signed.')) +
+      '<div class="gs-nav">' +
+        '<button type="button" class="btn btn-ghost" data-gs="back" hidden>Back</button>' +
+        '<button type="submit" class="btn btn-prism cr-btn gs-next">Next</button>' +
+      '</div>' +
+      '<p class="form-status" role="status"></p>' +
+      '<p class="fine gs-saved">Your answers are saved on this device as you go.</p>' +
+    '</form>';
+
+    return pageHero('✦ Get signed', 'Join the <span class="accent">founding roster</span>',
+      'Crashed is signing its first artists: psychedelic hip hop and trap, underground and rising. Five short steps, about three minutes, straight to ' + esc(first) + '.', 60) +
+      '<div class="wrap"><section class="sec gs" style="padding-top:56px">' +
+      '<div class="split" style="padding:0;gap:64px;align-items:flex-start">' + form +
+        '<aside class="split-side gs-aside">' +
+          '<p class="credit-h">Who we\'re looking for</p>' + lookingForList('look-list') +
+          '<div class="gs-eric">' + (F.photo ? '<img src="' + esc(F.photo) + '" alt="" width="64" height="64">' : '') +
+            '<div><p class="gs-eric-name">' + esc(F.name) + '</p><p class="fine">' + esc(F.role) + ' · listens to every submission himself</p></div></div>' +
+          '<p class="fine">Prefer email? Write to <a class="u-link" href="mailto:' + esc(to) + '">' + esc(to) + '</a> with private links, not attachments.</p>' +
+        '</aside>' +
+      '</div></section>' + signingInfo({ compact: true }) + '</div>' + footerSmall();
+  };
+
+  /* step-by-step behaviour for #sign-flow */
+  function gsData(form) {
+    const out = {};
+    $$('[name]', form).forEach((el) => {
+      if (el.name === '_gotcha') return;
+      if (el.type === 'checkbox') {
+        if (el.name === 'guardian' || el.name === 'rights') out[el.name] = el.checked;
+        else { out[el.name] = out[el.name] || []; if (el.checked) out[el.name].push(el.value); }
+      } else out[el.name] = el.value.trim();
+    });
+    return out;
+  }
+  function gsFill(form, data) {
+    $$('[name]', form).forEach((el) => {
+      if (el.name === '_gotcha' || !(el.name in data)) return;
+      const v = data[el.name];
+      if (el.type === 'checkbox') el.checked = Array.isArray(v) ? v.indexOf(el.value) >= 0 : !!v;
+      else el.value = v || '';
+    });
+  }
+  let gsTimer = 0;
+  function gsSave(form) {
+    clearTimeout(gsTimer);
+    gsTimer = setTimeout(() => { if (form.isConnected) store.set('signDraft', { v: 1, step: form._step || 0, data: gsData(form) }); }, 250);
+  }
+  function gsGuardian(form) {
+    const under = form.querySelector('[name=age]').value === 'Under 18';
+    form.querySelector('.gs-guardian').hidden = !under;
+  }
+  function gsReview(form) {
+    const d = gsData(form);
+    const row = (label, val, step) => val ? '<div><dt>' + label + '</dt><dd>' + val + '</dd><dd class="gs-edit"><button type="button" data-gs="go" data-i="' + step + '">Edit</button></dd></div>' : '';
+    const link = (u) => u ? '<a class="u-link" href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(u.replace(/^https?:\/\//, '').slice(0, 48)) + '</a>' : '';
+    const msg = d.message.length > 220 ? d.message.slice(0, 217) + '…' : d.message;
+    form.querySelector('.gs-review').innerHTML = '<dl class="gs-summary">' +
+      row('Artist', esc(d.artist) + (d.name ? ' <span class="muted">(' + esc(d.name) + ')</span>' : ''), 0) +
+      row('Email', esc(d.email), 0) + row('From', esc(d.city), 0) + row('Age', esc(d.age), 0) +
+      row('Tracks', [d.link1, d.link2, d.link3].filter(Boolean).map(link).join('<br>'), 1) +
+      row('Socials', [d.instagram && 'IG ' + esc(d.instagram), d.tiktok && 'TikTok ' + esc(d.tiktok)].filter(Boolean).join(' · ') + (d.streaming ? (d.instagram || d.tiktok ? '<br>' : '') + link(d.streaming) : ''), 1) +
+      row('Sound', esc(d.sound.join(', ')) + (d.soundsLike ? '<br><span class="muted">Sounds like ' + esc(d.soundsLike) + '</span>' : ''), 2) +
+      row('Stage', esc(d.stage), 2) + row('Looking for', esc(d.wants.join(', ')), 3) + row('About', esc(msg), 3) +
+    '</dl>';
+  }
+  function gsShow(form, n, focus) {
+    const steps = $$('.gs-step', form), last = steps.length - 1;
+    n = Math.max(0, Math.min(n, last));
+    form._step = n;
+    steps.forEach((s, i) => { s.hidden = i !== n; });
+    $$('.gs-progress li', form).forEach((li, i) => {
+      li.classList.toggle('done', i < n); li.classList.toggle('on', i === n);
+      const b = li.querySelector('button'); b.disabled = i >= n;
+      if (i === n) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+    });
+    form.querySelector('[data-gs=back]').hidden = n === 0;
+    form.querySelector('.gs-next').textContent = n === last ? 'Send to ' + D.founder.name.split(' ')[0] : n === last - 1 ? 'Review' : 'Next';
+    form.querySelector('.form-status').textContent = '';
+    if (n === last) gsReview(form);
+    if (focus) {
+      const top = form.getBoundingClientRect().top;
+      if (top < 80) window.scrollTo({ top: window.scrollY + top - 110, behavior: 'smooth' });
+      steps[n].querySelector('.gs-title').focus({ preventScroll: true });
+    }
+  }
+  /** Check the visible step. Returns true when it is complete. */
+  function gsCheck(form) {
+    const st = $$('.gs-step', form)[form._step || 0];
+    const base = validate(st);                                              // focuses the first bad text field itself
+    let ok = base, first = null;
+    const fail = (el, msg) => { setErr(el, msg); ok = false; first = first || el; };
+    const age = st.querySelector('[name=age]'), g = st.querySelector('[name=guardian]');
+    if (age && g && age.value === 'Under 18' && !g.checked) fail(g, 'Please check with a parent or guardian first');
+    const sound = st.querySelectorAll('[name=sound]');
+    if (sound.length && ![].some.call(sound, (c) => c.checked)) fail(sound[0], 'Pick at least one');
+    const rights = st.querySelector('[name=rights]');
+    if (rights && !rights.checked) fail(rights, 'Please confirm this before sending');
+    if (base && first) first.focus();
+    return ok;
+  }
+  function initSignFlow() {
+    const form = $('#sign-flow'); if (!form) return;
+    const draft = store.get('signDraft', null);
+    if (draft && draft.v === 1 && draft.data) {
+      gsFill(form, draft.data); gsGuardian(form);
+      form.dataset.t0 = Date.now() - 60000;                                  // typed on an earlier visit: don't treat a quick send as a bot
+    }
+    // reopen at the first step that still needs answers (never further than where they were)
+    let n = 0;
+    const want = draft && draft.step || 0;
+    while (n < want) {                                                      // checked quietly: no errors shown on load
+      const st = $$('.gs-step', form)[n];
+      const complete = $$('input, select, textarea', st).every((i) => !i.required || i.value.trim()) && (!st.querySelector('[name=sound]') || $$('[name=sound]:checked', st).length);
+      if (!complete) break;
+      n++;
+    }
+    gsShow(form, n, false);
+    if (draft && draft.data && draft.data.artist) form.querySelector('.gs-saved').textContent = 'Welcome back. We kept your answers on this device.';
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-gs]'); const form = b && b.closest('#sign-flow');
+    if (!form) return;
+    if (b.dataset.gs === 'back') gsShow(form, (form._step || 0) - 1, true);
+    if (b.dataset.gs === 'go') gsShow(form, +b.dataset.i, true);
+    gsSave(form);
+  });
+  ['input', 'change'].forEach((t) => document.addEventListener(t, (e) => {
+    const form = e.target.closest && e.target.closest('#sign-flow');
+    if (!form || e.target.name === '_gotcha') return;
+    if (e.target.name === 'age') gsGuardian(form);
+    if (e.target.name === 'sound') setErr(form.querySelector('[name=sound]'), '');
+    else if (e.target.type === 'checkbox' && e.target.getAttribute('aria-invalid') === 'true') setErr(e.target, '');
+    gsSave(form);
+  }));
+
   /* ---------- about ---------- */
   views.about = function () {
     const A = D.about, F = D.founder;
     const first = F.name.split(' ')[0];
     const ig = F.socials && F.socials.instagram;
-    return pageHero('✦ About', A.headline, esc(A.intro), 20) +
+    const M = A.manifesto || {};
+    const lines = M.lines && M.lines.length ? M.lines : [A.headline];
+    return '<section class="manifesto-hero" aria-labelledby="about-h">' +
+        '<div aria-hidden="true" class="cr-liquid manifesto-bg" data-viz="about" data-viz-hue="20"><div class="cr-marble" style="position:absolute;inset:-25%;filter:hue-rotate(20deg);animation:cr-spin 120s linear infinite"></div></div>' +
+        '<div aria-hidden="true" class="manifesto-shade"></div>' +
+        '<div class="wrap manifesto-inner">' + eyebrow(esc(M.kicker || '✦ About')) +
+          '<h1 id="about-h" class="manifesto-h" data-react>' + lines.map((l, i) => '<span class="m-line" style="--i:' + i + '">' + l + '</span>').join(' ') + '</h1>' +
+          '<p class="lede manifesto-sub">' + esc(A.intro) + '</p>' +
+          '<div class="btn-row manifesto-cta"><a href="#/get-signed" class="btn btn-prism cr-btn">Get signed</a>' +
+            '<a href="#/about/founder" class="btn btn-ghost" data-action="scroll" data-target="founder">Meet ' + esc(first) + '</a></div>' +
+        '</div>' +
+      '</section>' +
       '<div class="wrap">' +
-      '<section class="sec" style="padding-top:64px">' +
+      (A.pillars && A.pillars.length ? '<section class="manifesto-list" aria-labelledby="pillars-h">' +
+        '<h2 id="pillars-h" class="eyebrow">✦ The manifesto</h2>' +
+        '<ol class="m-statements">' + A.pillars.map((p, i) =>
+          '<li><span class="m-no">' + pad2(i + 1) + '</span><div><h3>' + esc(p.title) + '</h3><p>' + esc(p.text) + '</p></div></li>').join('') + '</ol>' +
+      '</section>' : '') +
+      '<section id="about-story" class="sec" style="padding-top:64px">' +
         '<div class="split" style="padding:0">' +
           '<div class="split-main">' + eyebrow('✦ The story') +
             '<h2 class="h-section" style="margin-bottom:32px">A label for<br><span class="accent">the float</span></h2>' +
@@ -663,14 +864,21 @@
         '</div>' +
       '</section>' +
 
-      '<section class="sec-sm" aria-labelledby="pillars-h">' +
-        '<h2 id="pillars-h" class="h-sub">What we stand for</h2>' +
-        '<div class="pillars">' + A.pillars.map((p, i) =>
-          '<div class="pillar cr-card"><span class="pillar-no">0' + (i + 1) + '</span>' + starSvg('', 'width:22px') +
-          '<h3>' + esc(p.title) + '</h3><p>' + esc(p.text) + '</p></div>').join('') + '</div>' +
+      ((D.signing || {}).lookingFor && D.signing.lookingFor.length ? '<section class="sec-sm looking" aria-labelledby="look-h">' +
+        '<div class="sec-head" style="margin-bottom:32px"><div>' + eyebrow('✦ The sound') + '<h2 id="look-h" class="h-section">Who we\'re <span class="accent">looking for</span></h2></div></div>' +
+        lookingForList('look-grid') +
+      '</section>' : '') +
+
+      '<section class="sign-band" aria-labelledby="band-h">' +
+        '<div aria-hidden="true" class="cr-liquid sign-band-bg"><div class="cr-marble" style="position:absolute;inset:-30%;filter:hue-rotate(-60deg);animation:cr-spin 90s linear infinite"></div></div>' +
+        '<div class="sign-band-inner">' + eyebrow('✦ ' + esc((D.founding || {}).kicker || 'Now signing')) +
+          '<h2 id="band-h" class="h-display">Are you <span class="accent">next?</span></h2>' +
+          '<p class="lede">Five short steps. Straight to ' + esc(first) + '.</p>' +
+          '<div class="btn-row"><a href="#/get-signed" class="btn btn-bone cr-btn">Get signed</a></div>' +
+        '</div>' +
       '</section>' +
 
-      signingInfo() +
+      signingInfo({ compact: true }) +
 
       '<section id="founder" class="founder" aria-labelledby="founder-h">' +
         '<div class="founder-photo">' +
@@ -722,7 +930,8 @@
     [/^\/shop\/?$/, () => ['merch', views.shop(), 'Shop']],
     [/^\/checkout\/?$/, () => ['', views.checkout(), 'Checkout']],
     [/^\/order\/([\w-]+)$/, (m) => ['', views.order(m[1]), 'Order confirmed']],
-    [/^\/contact(?:\/(\w+))?\/?$/, (m) => ['', views.contact(m[1]), 'Contact']],
+    [/^\/(?:get-signed|contact\/demos)\/?$/, () => ['signed', views.getSigned(), 'Get signed']],
+    [/^\/contact(?:\/(\w+))?\/?$/, (m) => ['contact', views.contact(m[1]), 'Contact']],
     [/^\/about\/?$/, () => ['about', views.about(), 'About']],
     [/^\/about\/(founder|contact)$/, (m) => ['about', views.about(), 'About', m[1] === 'founder' ? 'founder' : 'contact-founder']]
   ];
@@ -743,6 +952,7 @@
       $('#view').innerHTML = html;
       document.body.dataset.view = nav || 'page';
       if (nav === 'home' && featured) regList('featured', featured.trackObjs);
+      if (nav === 'signed') initSignFlow();
     }
     currentPath = path;
     document.title = title + ' · ' + D.label.name;
@@ -848,6 +1058,7 @@
       el.classList.remove('open');
       setTimeout(() => { if (!el.classList.contains('open')) el.hidden = true; }, 250);
       if (el.id === 'video-modal') $('#video-frame').innerHTML = '';
+      if (el.id === 'float') { clearTimeout(FL.idle); el.classList.remove('idle'); if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); setTimeout(() => window.CRViz && window.CRViz.refresh(), 0); }
     });
     document.body.classList.remove('locked');
     $('.menu-btn') && $('.menu-btn').setAttribute('aria-expanded', 'false');
@@ -921,8 +1132,8 @@
     P.setQueue(featured.trackObjs, 0, false);
 
     P.on((type) => {
-      if (type === 'track' || type === 'state') renderPlayer();
-      if (type === 'time') renderTime();
+      if (type === 'track' || type === 'state') { renderPlayer(); renderFloat(); }
+      if (type === 'time') { renderTime(); renderFloatTime(); }
     });
     let seeking = false;
     PUI.seek.addEventListener('input', () => { seeking = true; PUI.cur.textContent = fmtTime(PUI.seek.value * P.duration()); PUI.seek.style.setProperty('--p', (PUI.seek.value * 100) + '%'); });
@@ -1079,6 +1290,31 @@
       Cart.clear();
       location.hash = '#/order/' + order.id;
     }
+    if (kind === 'signup') {
+      const last = $$('.gs-step', form).length - 1, n = form._step || 0;
+      if (!gsCheck(form)) return;
+      if (n < last) { gsShow(form, n + 1, true); gsSave(form); return; }
+      const d = gsData(form), status = form.querySelector('.form-status'), F2 = D.forms || {};
+      if (form.querySelector('[name=_gotcha]').value) { sentState(form, 'demos'); return; }   // bot: pretend it worked, send nothing
+      if (fillSeconds(form) < (F2.minFillSeconds == null ? 4 : F2.minFillSeconds)) { status.textContent = 'That was quick. Give it a second and send again.'; return; }
+      const wait = cooldownLeft('signup');
+      if (wait) { status.textContent = 'You just sent one. Please wait ' + wait + ' seconds before sending another.'; return; }
+      const flat = {};
+      Object.keys(SIGN_LABELS).forEach((k) => { const v = d[k]; if (Array.isArray(v) ? v.length : v) flat[k] = Array.isArray(v) ? v.join(', ') : (v === true ? 'Yes' : v); });
+      const to = D.label.emails.demos || D.label.emails.general;
+      const subject = '[Get signed] ' + d.artist;
+      const done = () => { markSent('signup'); store.set('signDraft', null); sentState(form, 'demos'); };
+      const openEmail = (note) => {
+        const body = Object.keys(flat).filter((k) => k !== 'message').map((k) => SIGN_LABELS[k] + ': ' + flat[k]).join('\n') + '\n\n' + d.message;
+        window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        status.textContent = note + '✦ Your email app should open with everything filled in. Hit send there. If it didn\'t open, write to ' + to + '.';
+      };
+      if (!F2.endpoint) { openEmail(''); return; }
+      const btn = form.querySelector('.gs-next'), label = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Sending…'; status.textContent = '';
+      postJSON(F2.endpoint, Object.assign({ _subject: subject, _replyto: d.email, topic: 'Get signed' }, flat, F2.extra || {})).then(done,
+        () => { btn.disabled = false; btn.textContent = label; openEmail('We couldn\'t send that from here, so we\'re using email instead. '); });
+    }
     if (kind === 'contact') {
       if (!validate(form)) return;
       const fd = Object.fromEntries(new FormData(form).entries());
@@ -1119,6 +1355,65 @@
     if (navigator.share) navigator.share({ title, url }).catch((e) => { if (e && e.name !== 'AbortError') copy(); });
     else copy();
   }
+
+
+  /* ------------------------------------------------------------------ float mode */
+  // Full-screen listening room: the reactive marble fills the screen, the controls fade when idle.
+  const FL = { seeking: false, idle: 0 };
+  const floatOpen = () => { const f = $('#float'); return !!(f && !f.hidden); };
+  function openFloat() {
+    if (!P.current) return;
+    openLayer('float');
+    const fs = $('.f-fs'); if (fs) fs.hidden = !(document.fullscreenEnabled && $('#float').requestFullscreen);
+    renderFloat(); floatWake();
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (window.CRViz) window.CRViz.refresh(); }));
+  }
+  function renderFloat() {
+    if (!floatOpen()) return;
+    const t = P.current; if (!t) return;
+    $('.float-release').textContent = t.releaseTitle || '';
+    $('.float-title').textContent = t.title;
+    $('.float-artist').textContent = t.artistName + (t.feat ? ' feat. ' + t.feat : '');
+    const tg = $('.f-toggle');
+    tg.innerHTML = P.playing ? ICON.pause : ICON.play;
+    tg.setAttribute('aria-label', P.playing ? 'Pause' : 'Play');
+    $('#float').classList.toggle('playing', P.playing);
+    if (!P.playing) floatWake();
+    renderFloatTime();
+  }
+  function renderFloatTime() {
+    if (!floatOpen() || FL.seeking) return;
+    const d = P.duration(), c = Math.min(P.time(), d), p = d ? c / d : 0, s = $('.f-seek');
+    $('.f-cur').textContent = fmtTime(c); $('.f-dur').textContent = fmtTime(d);
+    s.value = p; s.style.setProperty('--p', (p * 100) + '%');
+  }
+  function floatWake() {
+    const f = $('#float'); if (!f) return;
+    f.classList.remove('idle');
+    clearTimeout(FL.idle);
+    FL.idle = setTimeout(() => { if (floatOpen() && P.playing && !FL.seeking) f.classList.add('idle'); }, 3200);
+  }
+  function floatFullscreen() {
+    if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return; }
+    const f = $('#float');
+    if (f.requestFullscreen) f.requestFullscreen().catch(() => toast('Full screen isn\'t available here.'));
+    else toast('Full screen isn\'t available here.');
+  }
+  (function initFloat() {
+    const f = $('#float'); if (!f) return;
+    const s = $('.f-seek');
+    s.addEventListener('input', () => { FL.seeking = true; $('.f-cur').textContent = fmtTime(s.value * P.duration()); s.style.setProperty('--p', (s.value * 100) + '%'); });
+    s.addEventListener('change', () => { P.seek(s.value * P.duration()); FL.seeking = false; floatWake(); });
+    ['pointermove', 'pointerdown', 'touchstart', 'focusin'].forEach((t) => f.addEventListener(t, floatWake, { passive: true }));
+    document.addEventListener('keydown', (e) => {
+      if (!floatOpen()) return;
+      floatWake();
+      const tag = e.target.tagName;
+      if (e.key === ' ' && tag !== 'BUTTON' && tag !== 'INPUT') { e.preventDefault(); e.stopPropagation(); P.toggle(); }
+      else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && tag !== 'INPUT') { e.preventDefault(); e.stopPropagation(); P.seek(P.time() + (e.key === 'ArrowRight' ? 10 : -10)); }
+      else if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); e.stopPropagation(); floatFullscreen(); }
+    }, true);
+  })();
 
   /* ------------------------------------------------------------------ actions */
   function sameQueue(list) { return list.length === P.queue.length && list.every((x, i) => P.queue[i].id === x.id); }
@@ -1213,14 +1508,16 @@
       case 'open-menu': openLayer('mobile-menu'); el.setAttribute('aria-expanded', 'true'); break;
       case 'close': closeOverlays(); break;
       case 'video': openVideo(+el.dataset.i); break;
-      case 'sign': closeOverlays(true); location.hash = '#/contact/demos'; break;
+      case 'sign': closeOverlays(true); location.hash = '#/get-signed'; break;
       case 'listen':
         closeOverlays(true);
-        if (!featured) { location.hash = '#/contact/demos'; break; }
+        if (!featured) { location.hash = '#/get-signed'; break; }
         if (P.current && P.current.releaseSlug === featured.slug) { if (!P.playing) P.play(); }
         else P.setQueue(featured.trackObjs, 0, true);
         break;
       case 'share': shareLink(el); break;
+      case 'float': openFloat(); break;
+      case 'float-fs': floatFullscreen(); break;
       case 'soon': toast((el.dataset.what || 'This') + ' is coming soon.'); break;
       case 'scroll': {
         e.preventDefault();

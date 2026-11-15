@@ -306,7 +306,7 @@
   function mount() {
     var want = null;
     if (isOn() && initGL() && glState === 'ok') {
-      want = document.querySelector('.cr-intro:not(.is-leaving) [data-viz]') || document.querySelector('#view [data-viz]');
+      want = document.querySelector('.layer-float.open [data-viz]') || document.querySelector('.cr-intro:not(.is-leaving) [data-viz]') || document.querySelector('#view [data-viz]');
     }
     if (want === slot && (!slot || canvas.isConnected)) return;
     if (slot) slot.classList.remove('viz-hidden');
