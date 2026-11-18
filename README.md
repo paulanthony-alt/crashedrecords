@@ -83,9 +83,29 @@ Texting alerts (Laylo etc.) need consent wording that should be checked by a law
 
 ## Link previews and sharing
 
-Messages, Instagram, X and Discord only read the page before the `#`, so every link into this site would show the same card. `node tools/build-share-pages.js` writes a small page per artist and release (plus About and Get signed) into `share/` with the right title and description, and an instant redirect to the real page. After adding artists or releases: run it, commit `share/`, and set `site.sharePages: true` in `data.js` so the Share buttons on artist and release pages use those links. (`--demo` includes the sample content; `--out dir` writes elsewhere.) Add a `cover` / `photo` image to an artist or release and its preview card uses it; otherwise the label card (`assets/img/og-image.png`) is used. When the site gets its own domain, update `site.url` in `data.js` and the `og:url`, `og:image`, `twitter:image` and `canonical` lines at the top of `index.html`.
+Messages, Instagram, X and Discord only read the page before the `#`, so every link into this site would show the same card. `node tools/build-share-pages.js` writes a small page per artist and release (plus About and Get signed) into `share/` with the right title and description, and an instant redirect to the real page. After adding artists or releases: run it, commit `share/`, and set `site.sharePages: true` in `data.js` so the Share buttons on artist and release pages use those links. (`--demo` includes the sample content; `--out dir` writes elsewhere.) Add a `cover` / `photo` image to an artist or release and its preview card uses it; otherwise the label card (`assets/img/og-image.png`) is used. If the domain ever changes, update `site.url` in `data.js` and the `og:url`, `og:image`, `twitter:image` and `canonical` lines at the top of `index.html`, then rerun the script.
 
 The home page's "Follow the float" section shows up when you paste post links into `social.posts` in `data.js` (see the comment there). It uses plain links rather than live embeds, so there are no third-party scripts.
+
+## Custom domain (crashedrecords.com)
+
+The site is served by GitHub Pages at https://crashedrecords.com. The `CNAME` file in the repo holds the domain, and GitHub keeps it in sync with Settings → Pages → Custom domain; don't delete it. The old paulanthony-alt.github.io/crashedrecords address redirects to the domain.
+
+DNS records at the domain registrar:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | @ | 185.199.108.153 |
+| A | @ | 185.199.109.153 |
+| A | @ | 185.199.110.153 |
+| A | @ | 185.199.111.153 |
+| AAAA | @ | 2606:50c0:8000::153 |
+| AAAA | @ | 2606:50c0:8001::153 |
+| AAAA | @ | 2606:50c0:8002::153 |
+| AAAA | @ | 2606:50c0:8003::153 |
+| CNAME | www | paulanthony-alt.github.io |
+
+Remove any other A, AAAA or CNAME records for `@` and `www` (registrars often add a "parking" record). Leave MX and TXT records alone: those are for email. Once GitHub's DNS check passes in Settings → Pages, tick **Enforce HTTPS**.
 
 ## Founding roster (no artists yet)
 
