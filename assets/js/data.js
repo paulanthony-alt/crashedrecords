@@ -47,7 +47,7 @@ window.CR_DATA = {
      it and committed the folder, set sharePages to true so the Share buttons
      use those pages. See the README. */
   site: {
-    url: 'https://paulanthony-alt.github.io/crashedrecords/',
+    url: 'https://crashedrecords.com/',
     sharePages: false
   },
 
